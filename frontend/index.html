@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdwinGraphics | Personalización Premium de Motos</title>
+    <link rel="icon" type="image/png" href="logo-edwin.png" />
+    <link rel="apple-touch-icon" href="logo-edwin.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdwinGraphics | Personalización Premium de Motos</title>
+    <link rel="icon" type="image/png" href="cabeza-edwin.png" />
+    <link rel="apple-touch-icon" href="cabeza-edwin.png" />
+
+  <!-- Google Fonts: Inter & Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <!-- OnlineWebFonts CDN -->
+  <link href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos" rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+    @font-face {
+      font-family: "Geist Pixel Circle";
+      src: url("fonts/GeistPixel-Circle.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #000000;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.22);
+      --glass-glow: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --muted: #a1a1aa;
+      --red: #e0142c;
+      --red-hover: #ff1a35;
+      --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+      --font-pixel: "Press Start 2P", cursive, monospace;
+      --font-display: "BubbledotICG-FinePos", "Geist Pixel Circle", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* BACKGROUND VIDEO FULLSCREEN FIXED */
+    .bg-fixed {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    /* INTRO SCREEN (2.8 SEGUNDOS CON EL LOGO) */
+    .intro-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.96);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .intro-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .intro-logo-placeholder {
+      width: 68px;
+      height: 68px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 35px rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      animation: dropBounce 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, floatPulse 2s ease-in-out infinite 0.9s;
+    }
+
+    @keyframes dropBounce {
+      0% { transform: translateY(-300px) scale(0.5, 1.4); opacity: 0; }
+      55% { transform: translateY(16px) scale(1.2, 0.8); opacity: 1; }
+      75% { transform: translateY(-6px) scale(0.95, 1.05); }
+      90% { transform: translateY(2px) scale(1.02, 0.98); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 35px rgba(255, 255, 255, 0.5); }
+      50% { transform: translateY(-4px) scale(1.04); box-shadow: 0 0 45px rgba(224, 20, 44, 0.6); }
+    }
+
+    .intro-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .intro-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(20px, 4.5vw, 34px);
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      animation: fadeInText 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInText {
+      from { opacity: 0; transform: translateX(-16px); filter: blur(8px); }
+      to { opacity: 1; transform: translateX(0); filter: blur(0); }
+    }
+
+    .intro-title span { color: var(--red); }
+
+    /* FIXED NAV HEADER (LIQUID GLASS REAL) - AJUSTADO PARA CELULAR */
+    .header-wrapper {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+
+    .header {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 880px;
+      gap: 12px;
+      background: rgba(18, 18, 22, 0.35);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+
+    .promo-circle-btn {
+      width: 42px;
+      height: 42px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+      flex-shrink: 0;
+      border: none;
+      cursor: pointer;
+      color: #000000;
+      font-size: 17px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+
+    .promo-circle-btn:hover {
+      transform: scale(1.08);
+      background-color: var(--red);
+      color: #fff;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      height: 42px;
+    }
+
+    .brand-pixel-text {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: #ffffff;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .brand-pixel-text span { color: var(--red); }
+
+    .header-logo-space {
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .header-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .nav-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 4px;
+    }
+
+    .nav-link {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+
+    .sign-in-btn {
+      height: 38px;
+      padding: 0 16px;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 500;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .sign-in-btn:hover {
+      background-color: var(--red);
+      border-color: var(--red);
+    }
+
+    /* CONTENT LAYOUT */
+    .content-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 20px 50px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .headline {
+      font-family: var(--font-display);
+      color: #ffffff;
+      font-size: clamp(28px, 5vw, 68px);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      text-shadow: 0 4px 25px rgba(0, 0, 0, 0.85);
+      margin: 0 auto 20px auto;
+      text-align: center;
+      width: 100%;
+    }
+
+    .subhead {
+      max-width: 580px;
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: #ffffff;
+      opacity: 0.9;
+      line-height: 1.6;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      margin: 0 auto 30px auto;
+      text-align: center;
+      width: 100%;
+    }
+
+    .cta-btn-main {
+      display: inline-block;
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+      transition: transform 0.25s ease;
+      margin: 0 auto;
+    }
+    .cta-btn-main:hover { transform: translateY(-2px) scale(1.04); }
+
+    /* ESTADÍSTICAS */
+    .stats-footer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      width: 100%;
+      max-width: 940px;
+      gap: 16px;
+      margin: 50px auto 0 auto;
+      padding-top: 20px;
+    }
+    .stat-item { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .stat-icon { font-family: var(--font-display); color: var(--red); font-size: 24px; }
+    .stat-data { display: flex; flex-direction: column; text-align: left; }
+    .stat-value { color: #ffffff; font-weight: 700; font-size: 22px; }
+    .stat-label { color: #d4d4d8; font-size: 12px; }
+
+    /* SECCIONES GLASSMORPHISM LIQUID */
+    .section-block {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .section-header-tag {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 36px;
+    }
+
+    /* CATÁLOGO DINÁMICO */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .catalog-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .catalog-card:hover {
+      border-color: var(--red);
+      transform: translateY(-4px);
+    }
+
+    .product-img-box {
+      width: 100%;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #71717a;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .out-of-stock-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #000;
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .product-tag { color: var(--red); font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+    .product-name { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .product-price { color: var(--muted); font-size: 14px; margin-bottom: 18px; font-weight: 600; }
+
+    .card-actions { display: flex; gap: 8px; margin-top: auto; }
+    
+    .btn-details {
+      flex: 1; padding: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-details:hover { background: rgba(255,255,255,0.2); }
+
+    .btn-add-cart {
+      flex: 1.2; padding: 10px; background: var(--red); border: none;
+      color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s ease;
+    }
+    .btn-add-cart:hover { background: var(--red-hover); }
+    .btn-add-cart:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+    /* UBICACIÓN */
+    .location-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .location-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .location-info h3 { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+    .location-info p { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+
+    .btn-route-normal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--red);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-route-normal:hover {
+      background: var(--red-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(224, 20, 44, 0.4);
+    }
+
+    .map-container {
+      width: 100%;
+      height: 320px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .map-container iframe { width: 100%; height: 100%; border: 0; }
+
+    /* REDES SOCIALES */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .social-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 18px;
+      padding: 32px 20px;
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+    .social-card i { font-size: 28px; }
+    .social-card span { font-size: 14px; font-weight: 600; }
+    .social-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #fff;
+      transform: translateY(-4px);
+    }
+
+    /* FOOTER */
+    .site-footer {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* MODALES CON PURO LIQUID GLASS */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.active { display: flex; }
+
+    .modal-card {
+      background: rgba(18, 18, 22, 0.65);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      border-radius: 28px;
+      width: 100%;
+      max-width: 540px;
+      padding: 32px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: #ffffff;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    .modal-close:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .modal-card input, .modal-card select {
+      width: 100%; 
+      padding: 12px 16px; 
+      margin-top: 6px; 
+      margin-bottom: 14px; 
+      border-radius: 12px; 
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      background: rgba(0, 0, 0, 0.5); 
+      color: #fff; 
+      font-size: 13.5px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-card select option {
+      background: #121216;
+      color: #ffffff;
+    }
+
+    .modal-card input:focus, .modal-card select:focus {
+      outline: none;
+      border-color: #ffffff;
+      background: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .field-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.02em;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* CONSOLA ADMINISTRATIVA */
+    .admin-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .admin-form-box {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .admin-prod-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      gap: 8px;
+    }
+
+    .admin-prod-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-sm-edit { background: #3b82f6; color: #fff; }
+    .btn-sm-toggle { background: #eab308; color: #000; }
+    .btn-sm-del { background: #ef4444; color: #fff; }
+
+    /* TOAST NOTIFICATIONS */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--red);
+      color: #ffffff;
+      padding: 14px 22px;
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(224, 20, 44, 0.35);
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .nav-pill { display: none; }
+      .stats-footer { grid-template-columns: repeat(2, 1fr); }
+      .location-wrapper { grid-template-columns: 1fr; }
+      .social-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-block { padding: 24px; margin: 40px 16px; }
+      .headline { font-size: 30px; }
+      .toast-container { left: 50%; right: auto; transform: translateX(-50%); bottom: 16px; width: 90%; }
+      .toast { justify-content: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO SCREEN -->
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-brand">
+      <div class="intro-logo-placeholder">
+        <img src="logo-edwin.png" alt="Logo" class="intro-logo-img" onerror="this.style.display='none'" />
+      </div>
+      <div class="intro-title">Edwin<span>Graphics</span></div>
+    </div>
+  </div>
+
+  <!-- BACKGROUND VIDEO FULLSCREEN -->
+  <div class="bg-fixed">
+    <video class="bg-video" autoplay muted loop playsinline>
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- FIXED NAV HEADER -->
+  <div class="header-wrapper">
+    <header class="header">
+      <button class="promo-circle-btn" onclick="openSysModal('promoModal')" title="Promoción Especial">
+        <i class="fa-solid fa-bolt"></i>
+      </button>
+
+      <div class="header-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+        <div class="brand-pixel-text">Edwin<span>Graphics</span></div>
+        <div class="header-logo-space">
+          <img src="logo-edwin.png" alt="Logo" class="header-logo-img" onerror="this.style.display='none'" />
+        </div>
+      </div>
+
+      <nav class="nav-pill">
+        <a href="#inicio" class="nav-link active">Inicio</a>
+        <a href="#catalogo" class="nav-link">Catálogo</a>
+        <a href="#ubicacion" class="nav-link">Ubicación</a>
+        <a href="#redes" class="nav-link">Redes</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="sign-in-btn" onclick="openSysModal('cartModal')">
+          <i class="fa-solid fa-cart-shopping"></i> &nbsp;<span id="cartCount">0</span>
+        </button>
+        <button class="sign-in-btn" onclick="openSysModal('adminModal')">Admin</button>
+      </div>
+    </header>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="content-container">
+
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="inicio">
+      <h1 class="headline">
+        Tu estilo no se copia,<br />se diseña.
+      </h1>
+
+      <p class="subhead">
+        Personalización premium para tu moto. Vinilos de gran formato, diseños exclusivos y acabados profesionales que llevan tu moto a otro nivel.
+      </p>
+
+      <a href="#catalogo" class="cta-btn-main">Ver Catálogo</a>
+
+      <div class="stats-footer">
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fa-solid fa-motorcycle"></i></span>
+          <div class="stat-data">
+            <span class="stat-value">+2500</span>
+            <span class="stat-label">Motos Personalizadas</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fa-solid fa-award"></i></span>
+          <div class="stat-data">
+            <span class="stat-value">1 Año</span>
+            <span class="stat-label">De Experiencia</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fa-solid fa-shield-halved"></i></span>
+          <div class="stat-data">
+            <span class="stat-value">100%</span>
+            <span class="stat-label">Garantía de Calidad</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fa-solid fa-location-dot"></i></span>
+          <div class="stat-data">
+            <span class="stat-value">2 Locales</span>
+            <span class="stat-label">Puntos Físicos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATÁLOGO SECTION -->
+    <section class="section-block" id="catalogo">
+      <div class="section-header-tag">CATÁLOGO</div>
+      <h2 class="section-title">Productos</h2>
+      <p class="section-subtitle">Elige el diseño que más se adapte a tu estilo.</p>
+
+      <div class="catalog-grid" id="productsGrid"></div>
+    </section>
+
+    <!-- UBICACIÓN SECTION -->
+    <section class="section-block" id="ubicacion">
+      <div class="section-header-tag">VISÍTANOS</div>
+      <h2 class="section-title">Ubicación</h2>
+      <p class="section-subtitle">Encuéntranos en nuestros locales físicos.</p>
+
+      <div class="location-wrapper">
+        <div class="location-info">
+          <h3>Palos Verde</h3>
+          <p>Contamos con dos locales dentro del mismo punto para atenderte mejor y mostrarte nuestros trabajos en vivo.</p>
+          <a href="https://maps.app.goo.gl/6gZzkRh1tiLtpwGb9" target="_blank" class="btn-route-normal">Ver ruta</a>
+        </div>
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps?q=4.2630666,-73.5584399+(Palos+Verdes)&z=17&output=embed" loading="lazy"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- REDES SOCIALES SECTION -->
+    <section class="section-block" id="redes">
+      <div class="section-header-tag">SÍGUENOS</div>
+      <h2 class="section-title">Redes sociales</h2>
+      <p class="section-subtitle">Mira nuestros trabajos y escríbenos directamente.</p>
+
+      <div class="social-grid">
+        <a href="https://www.tiktok.com/@edwincalcomanias" target="_blank" class="social-card">
+          <i class="fa-brands fa-tiktok"></i>
+          <span>TikTok</span>
+        </a>
+        <a href="https://www.instagram.com/ediwngrapichs" target="_blank" class="social-card">
+          <i class="fa-brands fa-instagram"></i>
+          <span>Instagram</span>
+        </a>
+        <a href="https://www.facebook.com/share/1Jp7fpSR3B/" target="_blank" class="social-card">
+          <i class="fa-brands fa-facebook"></i>
+          <span>Facebook</span>
+        </a>
+        <a href="https://wa.me/573116945695" target="_blank" class="social-card">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div>© 2026 EdwinGraphics. Todos los derechos reservados.</div>
+      <div>Si quieres personalizar tu moto, no te detengas con nosotros.</div>
+    </footer>
+
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- MODAL: PROMOCIONAL -->
+  <div class="modal-backdrop" id="promoModal">
+    <div class="modal-card" style="text-align:center;">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <div style="font-size:36px; color:var(--red); margin-bottom:10px;"><i class="fa-solid fa-bolt-lightning"></i></div>
+      <h2 style="font-family:var(--font-display); margin-bottom:10px;">¡Diseño Exclusivo!</h2>
+      <p style="color:var(--muted); font-size:14px; line-height:1.5; margin-bottom:18px;">
+        Recibe instalación preferencial y asesoría en diseño 3D gratis agendando hoy tu personalización.
+      </p>
+      <a href="https://wa.me/573116945695?text=Hola%20Edwin!%20Quiero%20aprovechar%20la%20promoci%C3%B3n%20especial%20para%20mi%20moto" target="_blank" class="btn-route-normal" style="width:100%; text-align:center;">
+        <i class="fa-brands fa-whatsapp"></i> &nbsp;Agendar por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLES DE PRODUCTO -->
+  <div class="modal-backdrop" id="detailsModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <span class="product-tag" id="dTag">CATEGORÍA</span>
+      <h2 style="font-family:var(--font-sans); font-size:24px; font-weight:800; margin-bottom:10px;" id="dTitle">Nombre del Producto</h2>
+      
+      <div class="product-img-box" style="height:240px; margin-bottom:16px;" id="dImgContainer">
+        <!-- Render dinámico -->
+      </div>
+      
+      <p style="font-size:20px; font-weight:700; color:var(--red); margin-bottom:12px;" id="dPrice">$0</p>
+      <p style="color:var(--muted); font-size:14px; line-height:1.6; margin-bottom:20px;">
+        Personalización de alta resistencia en vinilo especializado. Resistente al agua, al sol y al lavado de alta presión. Acabado brillante con laminado protector.
+      </p>
+      
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button id="dAddBtn" class="btn-add-cart" style="width:100%; padding:14px; font-size:14px;">Añadir al Carrito</button>
+        <div id="dOnlinePayContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDICIÓN DE PRODUCTO DENTRO DEL ADMIN -->
+  <div class="modal-backdrop" id="customPriceModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;" id="cpTitle">Modificar Producto</h3>
+      
+      <span class="field-label">Nombre del Producto:</span>
+      <input type="text" id="cpNameInput" placeholder="Nombre del producto" />
+
+      <span class="field-label">Descripción / Categoría:</span>
+      <input type="text" id="cpTagInput" placeholder="Categoría" />
+
+      <span class="field-label">Precio (Número o Texto):</span>
+      <input type="text" id="cpInput" placeholder="Ej: 150000 o Consultar" />
+
+      <span class="field-label">Estado:</span>
+      <select id="cpStockSelect">
+        <option value="available">Disponible</option>
+        <option value="outOfStock">Agotado</option>
+      </select>
+
+      <span class="field-label">Imagen del Producto (URL):</span>
+      <input type="text" id="cpImgUrl" placeholder="Pega la URL de la imagen aquí" />
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="saveCustomPrice()" class="btn-add-cart" style="flex:1;">Guardar cambios</button>
+        <button onclick="closeEditModal()" class="btn-details" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CARRITO Y OPCIONES DE PAGO -->
+  <div class="modal-backdrop" id="cartModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <h2 style="font-family:var(--font-display); margin-bottom:12px;">Tu Carrito</h2>
+      <div id="cartItems" style="max-height:160px; overflow-y:auto; margin-bottom:15px;"></div>
+      <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Total: <span id="cartSubtotal">$0</span></div>
+      
+      <form id="checkoutForm">
+        <span class="field-label">Nombre del Cliente</span>
+        <input type="text" id="cName" placeholder="Tu nombre completo" required />
+        
+        <span class="field-label">Teléfono de Contacto</span>
+        <input type="tel" id="cPhone" placeholder="Número de celular" required />
+
+        <span class="field-label">Departamento</span>
+        <select id="cDepartment" onchange="onDeptChange()" required>
+          <option value="">Selecciona tu departamento...</option>
+        </select>
+
+        <span class="field-label">Ciudad / Municipio (Selecciona o escribe si no aparece)</span>
+        <input type="text" id="cCity" list="cityOptions" placeholder="Escribe o busca tu ciudad..." disabled required />
+        <datalist id="cityOptions"></datalist>
+
+        <span class="field-label">Dirección de Entrega</span>
+        <input type="text" id="cAddress" placeholder="Barrio, Calle / Carrera, Casa o Apto" required />
+
+        <span class="field-label">Método de Pago</span>
+        <select id="cPayment">
+          <option value="Nequi">Nequi</option>
+          <option value="PSE">PSE</option>
+          <option value="Tarjeta">Tarjeta Débito/Crédito</option>
+          <option value="Shopify / Online">Pagar Online (Shopify)</option>
+        </select>
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+          <button type="submit" class="btn-add-cart" style="width:100%; padding:12px;"><i class="fa-brands fa-whatsapp"></i> &nbsp;Enviar Pedido por WhatsApp</button>
+          <button type="button" onclick="payCartOnline()" class="sign-in-btn" style="width:100%; padding:12px; background:rgba(0,158,227,0.2); border-color:#009ee3; text-align:center; display:block;"><i class="fa-solid fa-credit-card"></i> &nbsp;Pagar Directo en Shopify</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN -->
+  <div class="modal-backdrop" id="adminModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <h2 style="font-family:var(--font-display); margin-bottom:12px;">Panel Administrativo</h2>
+      
+      <div id="adminLoginView">
+        <span class="field-label">Contraseña de Administrador</span>
+        <input type="password" id="adminPass" placeholder="Ingresa la contraseña" autocomplete="current-password" />
+        <button onclick="loginAdmin()" class="btn-add-cart" style="width:100%; margin-top:6px; padding:12px;">Entrar al Panel</button>
+      </div>
+
+      <div id="adminDashboardView" style="display:none;" class="admin-controls">
+        
+        <!-- SECCIÓN: CONFIGURACIÓN DE PAGO (SHOPIFY) -->
+        <div class="admin-form-box" style="border-color: var(--red);">
+          <h4 style="font-size:14px; margin-bottom:8px; color:var(--red);">Configuración de pago (Shopify Global)</h4>
+          <span class="field-label">LINK DE SHOPIFY (Aplicará para todos los botones de pago online)</span>
+          <input type="text" id="globalShopifyLink" placeholder="https://tu-tienda.myshopify.com/checkout/..." />
+          <button onclick="saveGlobalShopify()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:4px;">Guardar Link de Shopify</button>
+        </div>
+
+        <!-- SECCIÓN: AÑADIR PRODUCTO -->
+        <div class="admin-form-box">
+          <h4 style="font-size:14px; margin-bottom:8px; color:var(--red);">Añadir Nuevo Producto</h4>
+          <span class="field-label">Nombre del Producto</span>
+          <input type="text" id="newProdName" placeholder="Nombre (ej: Tanque R15)" />
+          
+          <span class="field-label">Precio</span>
+          <input type="text" id="newProdPrice" placeholder="Precio (ej: 150000)" />
+          
+          <span class="field-label">Categoría</span>
+          <input type="text" id="newProdTag" placeholder="Categoría (ej: TANQUE)" />
+          
+          <span class="field-label">Imagen del Producto (URL)</span>
+          <input type="text" id="newProdUrl" placeholder="Pega la URL de la imagen aquí" />
+
+          <button onclick="addNewProduct()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:8px;">Guardar Producto</button>
+        </div>
+
+        <div>
+          <h4 style="font-size:14px; margin-bottom:10px;">Inventario Actual</h4>
+          <div id="adminProdList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const rawData = [
+      "Acacías — Meta", "Acandí — Chocó", "Acevedo — Huila", "Achí — Bolívar", "Agrado — Huila",
+      "Agua de Dios — Cundinamarca", "Aguachica — Cesar", "Aguada — Santander", "Aguadas — Caldas",
+      "Aguazul — Casanare", "Agustín Codazzi — Cesar", "Aipe — Huila", "Albania — Caquetá",
+      "Albania — La Guajira", "Albania — Santander", "Albán — Cundinamarca", "Albán — Nariño",
+      "Almaguer — Cauca", "Alpujarra — Tolima", "Altamira — Huila", "Amalfi — Antioquia",
+      "Ambalema — Tolima", "Anapoima — Cundinamarca", "Ancuyá — Nariño", "Andes — Antioquia",
+      "Angelópolis — Antioquia", "Angostura — Antioquia", "Anolaima — Cundinamarca", "Anorí — Antioquia",
+      "Anserma — Caldas", "Ansermanuevo — Valle del Cauca", "Anzá — Antioquia", "Anzoátegui — Tolima",
+      "Apartadó — Antioquia", "Apía — Risaralda", "Apulo — Cundinamarca", "Aquitania — Boyacá",
+      "Aracataca — Magdalena", "Aranzazu — Caldas", "Aratoca — Santander", "Arauca — Arauca",
+      "Arboleda — Nariño", "Arboledas — Norte de Santander", "Arboletes — Antioquia", "Arcabuco — Boyacá",
+      "Arenal — Bolívar", "Argelia — Antioquia", "Argelia — Cauca", "Argelia — Valle del Cauca",
+      "Ariguaní — Magdalena", "Arjona — Bolívar", "Armenia — Antioquia", "Armenia — Quindío",
+      "Armenia — Santander", "Armero — Tolima", "Arroyohondo — Bolívar", "Astrea — Cesar",
+      "Ataco — Tolima", "Atrato — Chocó", "Ayapel — Córdoba", "Bagadó — Chocó", "Bahía Solano — Chocó",
+      "Bajo Baudó — Chocó", "Balboa — Cauca", "Balboa — Risaralda", "Baranoa — Atlántico",
+      "Barbosa — Antioquia", "Barbosa — Santander", "Barichara — Santander", "Barranca de Upía — Meta",
+      "Barrancabermeja — Santander", "Barrancas — La Guajira", "Barranco de Loba — Bolívar",
+      "Barranquilla — Atlántico", "Becerril — Cesar", "Belalcázar — Caldas", "Belén — Boyacá",
+      "Belén — Nariño", "Belén de Bajirá — Chocó", "Belén de Umbría — Risaralda", "Bello — Antioquia",
+      "Belmira — Antioquia", "Beltrán — Cundinamarca", "Berbeo — Boyacá", "Betania — Antioquia",
+      "Betéitiva — Boyacá", "Betulia — Antioquia", "Betulia — Santander", "Bituima — Cundinamarca",
+      "Boavita — Boyacá", "Bochalema — Norte de Santander", "Bogotá, D. C. — Bogotá", "Bojacá — Cundinamarca",
+      "Bolívar — Cauca", "Bolívar — Santander", "Bolívar — Valle del Cauca", "Bosconia — Cesar",
+      "Boyacá — Boyacá", "Briceño — Antioquia", "Briceño — Boyacá", "Bugalagrande — Valle del Cauca",
+      "Buenaventura — Valle del Cauca", "Buenavista — Boyacá", "Buenavista — Córdoba", "Buenavista — Quindío",
+      "Buenavista — Sucre", "Buenos Aires — Cauca", "Buesaco — Nariño", "Buga — Valle del Cauca",
+      "Buriticá — Antioquia", "Busbanzá — Boyacá", "Cabrera — Cundinamarca", "Cabrera — Santander",
+      "Cabuyaro — Meta", "Cáceres — Antioquia", "Cachipay — Cundinamarca", "Cáchira — Norte de Santander",
+      "Cádiz — Santander", "Caicedo — Antioquia", "Caicedonia — Valle del Cauca", "Cajamarca — Tolima",
+      "Cajibío — Cauca", "Cajicá — Cundinamarca", "Calamar — Bolívar", "Calamar — Guaviare",
+      "Calarcá — Quindío", "Caldas — Antioquia", "Caldas — Boyacá", "Caldas — Santander",
+      "Caldono — Cauca", "California — Santander", "Calima — Valle del Cauca", "Caloto — Cauca",
+      "Campamento — Antioquia", "Campo de la Cruz — Atlántico", "Campoalegre — Huila", "Campohermoso — Boyacá",
+      "Canalete — Córdoba", "Candelaria — Atlántico", "Candelaria — Valle del Cauca", "Cantagallo — Bolívar",
+      "Cañasgordas — Antioquia", "Caparrapí — Cundinamarca", "Capela — Santander", "Capilla — Boyacá",
+      "Capitanes — Santander", "Capitanejo — Santander", "Caracolí — Antioquia", "Caramanta — Antioquia",
+      "Carcasí — Santander", "Carepa — Antioquia", "Carmen de Apicalá — Tolima", "Carmen de Carupa — Cundinamarca",
+      "Carmen del Darién — Chocó", "Carurú — Vaupés", "Casabianca — Tolima", "Castilla la Nueva — Meta",
+      "Caucasia — Antioquia", "Cepitá — Santander", "Cereté — Córdoba", "Cértegui — Chocó",
+      "Chachagüí — Nariño", "Chaguaní — Cundinamarca", "Chalán — Sucre", "Chaparral — Tolima",
+      "Charalá — Santander", "Charta — Santander", "Chía — Cundinamarca", "Chibolo — Magdalena",
+      "Chigorodó — Antioquia", "Chimá — Córdoba", "Chimichagua — Cesar", "Chinácota — Norte de Santander",
+      "Chinavita — Boyacá", "Chinú — Córdoba", "Chipaque — Cundinamarca", "Chipatá — Santander",
+      "Chiquinquirá — Boyacá", "Chíquiza — Boyacá", "Chima — Santander", "Chinchiná — Caldas",
+      "Chiriguaná — Cesar", "Chiscas — Boyacá", "Chita — Boyacá", "Chitagá — Norte de Santander",
+      "Chitaraque — Boyacá", "Chivatá — Boyacá", "Chivor — Boyacá", "Choachí — Cundinamarca",
+      "Chocontá — Cundinamarca", "Cicuco — Bolívar", "Ciénaga — Magdalena", "Ciénaga de Oro — Córdoba",
+      "Ciénaga de Zapatosa — Cesar", "Cimitarra — Santander", "Circasia — Quindío", "Cisneros — Antioquia",
+      "Ciudad Bolívar — Antioquia", "Clemencia — Bolívar", "Cocorná — Antioquia", "Coello — Tolima",
+      "Cogua — Cundinamarca", "Colón — Nariño", "Colón — Putumayo", "Coloso — Sucre", "Cómbita — Boyacá",
+      "Concepción — Antioquia", "Concepción — Santander", "Concordia — Antioquia", "Concordia — Magdalena",
+      "Condoto — Chocó", "Confines — Santander", "Consacá — Nariño", "Contadero — Nariño",
+      "Contratación — Santander", "Convención — Norte de Santander", "Copacabana — Antioquia",
+      "Coper — Boyacá", "Córdoba — Bolívar", "Córdoba — Nariño", "Córdoba — Quindío", "Corinto — Cauca",
+      "Coromoro — Santander", "Corozal — Sucre", "Corrales — Boyacá", "Cota — Cundinamarca",
+      "Cotorra — Córdoba", "Covarachía — Boyacá", "Coveñas — Sucre", "Coyaima — Tolima",
+      "Cravo Norte — Arauca", "Cuaspud — Nariño", "Cucunubá — Cundinamarca", "Cúcuta — Norte de Santander",
+      "Cumaral — Meta", "Cumaribo — Vichada", "Cumbal — Nariño", "Cumbitara — Nariño", "Cunday — Tolima",
+      "Curillo — Caquetá", "Curití — Santander", "Curumaní — Cesar", "Dabeiba — Antioquia",
+      "Dagua — Valle del Cauca", "Dibulla — La Guajira", "Distracción — La Guajira", "Dolores — Tolima",
+      "Donmatías — Antioquia", "Dosquebradas — Risaralda", "Duitama — Boyacá", "Durania — Norte de Santander",
+      "Ebéjico — Antioquia", "El Águila — Valle del Cauca", "El Bagre — Antioquia", "El Banco — Magdalena",
+      "El Cairo — Valle del Cauca", "El Calvario — Meta", "El Carmen de Atrato — Chocó",
+      "El Carmen de Bolívar — Bolívar", "El Carmen — Norte de Santander", "El Carmen de Chucurí — Santander",
+      "El Castillo — Meta", "El Cerrito — Valle del Cauca", "El Charco — Nariño", "El Colegio — Cundinamarca",
+      "El Copey — Cesar", "El Doncello — Caquetá", "El Dorado — Meta", "El Dovio — Valle del Cauca",
+      "El Espinal — Tolima", "El Guacamayo — Santander", "El Guamo — Bolívar", "El Guamo — Tolima",
+      "El Molino — La Guajira", "El Paso — Cesar", "El Paujil — Caquetá", "El Peñol — Nariño",
+      "El Peñón — Bolívar", "El Peñón — Cundinamarca", "El Peñón — Santander", "El Piñón — Magdalena",
+      "El Playón — Santander", "El Retén — Magdalena", "El Retorno — Guaviare", "El Roble — Sucre",
+      "El Rosal — Cundinamarca", "El Rosario — Nariño", "El Santuario — Antioquia", "El Tablón de Gómez — Nariño",
+      "El Tambo — Cauca", "El Tambo — Nariño", "El Tarra — Norte de Santander", "El Zulia — Norte de Santander",
+      "Elías — Huila", "Encino — Santander", "Enciso — Santander", "Entrerríos — Antioquia",
+      "Envigado — Antioquia", "Espinal — Tolima", "Facatativá — Cundinamarca", "Falan — Tolima",
+      "Filadelfia — Caldas", "Filandia — Quindío", "Firavitoba — Boyacá", "Flandes — Tolima",
+      "Florencia — Caquetá", "Florencia — Cauca", "Floresta — Boyacá", "Florida — Valle del Cauca",
+      "Floridablanca — Santander", "Fómeque — Cundinamarca", "Fonseca — La Guajira", "Fortul — Arauca",
+      "Fosca — Cundinamarca", "Francisco Pizarro — Nariño", "Fresno — Tolima", "Frontino — Antioquia",
+      "Fuente de Oro — Meta", "Fundación — Magdalena", "Funes — Nariño", "Funza — Cundinamarca",
+      "Fuquene — Cundinamarca", "Fusagasugá — Cundinamarca", "Gachancipá — Cundinamarca", "Gachalá — Cundinamarca",
+      "Gachantivá — Boyacá", "Gachetá — Cundinamarca", "Galán — Santander", "Galapa — Atlántico",
+      "Galeras — Sucre", "Gama — Cundinamarca", "Garagoa — Boyacá", "Garzón — Huila", "Génova — Quindío",
+      "Gigante — Huila", "Giraldo — Antioquia", "Girardot — Cundinamarca", "Girardota — Antioquia",
+      "Girón — Santander", "Ginebra — Valle del Cauca", "Gómez Plata — Antioquia", "González — Cesar",
+      "Gramalote — Norte de Santander", "Granada — Antioquia", "Granada — Cundinamarca", "Granada — Meta",
+      "Guaca — Santander", "Guacamayas — Boyacá", "Guacarí — Valle del Cauca", "Guachetá — Cundinamarca",
+      "Guachené — Cauca", "Guachucal — Nariño", "Guadalajara de Buga — Valle del Cauca", "Guadalupe — Antioquia",
+      "Guadalupe — Huila", "Guadalupe — Santander", "Guaduas — Cundinamarca", "Guaitarilla — Nariño",
+      "Gualmatán — Nariño", "Guamal — Magdalena", "Guamal — Meta", "Guamo — Tolima", "Guapi — Cauca",
+      "Guapotá — Santander", "Guaranda — Sucre", "Guarne — Antioquia", "Guasca — Cundinamarca",
+      "Guatapé — Antioquia", "Guataquí — Cundinamarca", "Guatavita — Cundinamarca", "Guateque — Boyacá",
+      "Guática — Risaralda", "Guavatá — Santander", "Guayabal de Síquima — Cundinamarca", "Guayabetal — Cundinamarca",
+      "Guayatá — Boyacá", "Gutiérrez — Cundinamarca", "Hacarí — Norte de Santander", "Hatillo de Loba — Bolívar",
+      "Hato — Santander", "Hato Corozal — Casanare", "Hatonuevo — La Guajira", "Heliconia — Antioquia",
+      "Herveo — Tolima", "Hobo — Huila", "Honda — Tolima", "Ibagué — Tolima", "Icononzo — Tolima",
+      "Iles — Nariño", "Imués — Nariño", "Inírida — Guainía", "Inzá — Cauca", "Ipiales — Nariño",
+      "Isnos — Huila", "Istmina — Chocó", "Ituango — Antioquia", "Iza — Boyacá", "Jamundí — Valle del Cauca",
+      "Jardín — Antioquia", "Jericó — Antioquia", "Jericó — Boyacá", "Jerusalen — Cundinamarca",
+      "Jesús María — Santander", "Jordán — Santander", "Juan de Acosta — Atlántico", "Junín — Cundinamarca",
+      "La Apartada — Córdoba", "La Argentina — Huila", "La Belleza — Santander", "La Calera — Cundinamarca",
+      "La Capilla — Boyacá", "La Ceja — Antioquia", "La Celia — Risaralda", "La Cruz — Nariño",
+      "La Cumbre — Valle del Cauca", "La Dorada — Caldas", "La Esperanza — Norte de Santander",
+      "La Estrella — Antioquia", "La Florida — Nariño", "La Gloria — Cesar", "La Jagua de Ibirico — Cesar",
+      "La Jagua del Pilar — La Guajira", "La Llanada — Nariño", "La Macarena — Meta", "La Merced — Caldas",
+      "La Mesa — Cundinamarca", "La Montañita — Caquetá", "La Palma — Cundinamarca", "La Paz — Cesar",
+      "La Paz — Santander", "La Peña — Cundinamarca", "La Pintada — Antioquia", "La Plata — Huila",
+      "La Playa — Norte de Santander", "La Primavera — Vichada", "La Salina — Casanare", "La Sierra — Cauca",
+      "La Tebaida — Quindío", "La Unión — Antioquia", "La Unión — Nariño", "La Unión — Sucre",
+      "La Unión — Valle del Cauca", "La Uvita — Boyacá", "La Vega — Cauca", "La Vega — Cundinamarca",
+      "Labateca — Norte de Santander", "Labranzagrande — Boyacá", "Landázuri — Santander", "Lebrija — Santander",
+      "Leiva — Nariño", "Lejanías — Meta", "Lenguazaque — Cundinamarca", "Leticia — Amazonas",
+      "Líbano — Tolima", "Liborina — Antioquia", "Linares — Nariño", "Litoral del San Juan — Chocó",
+      "Lloró — Chocó", "López de Micay — Cauca", "Lorica — Córdoba", "Los Andes — Nariño",
+      "Los Córdobas — Córdoba", "Los Palmitos — Sucre", "Los Patios — Norte de Santander", "Los Santos — Santander",
+      "Lourdes — Norte de Santander", "Luruaco — Atlántico", "Macanal — Boyacá", "Macaravita — Santander",
+      "Maceo — Antioquia", "Machetá — Cundinamarca", "Madrid — Cundinamarca", "Magangué — Bolívar",
+      "Magüí — Nariño", "Mahates — Bolívar", "Maicao — La Guajira", "Majagual — Sucre", "Málaga — Santander",
+      "Malambo — Atlántico", "Mallama — Nariño", "Manatí — Atlántico", "Manaure — Cesar", "Manaure — La Guajira",
+      "Maní — Casanare", "Manizales — Caldas", "Manta — Cundinamarca", "Manzanares — Caldas",
+      "Mapiripán — Meta", "María la Baja — Bolívar", "Maripí — Boyacá", "Mariquita — Tolima",
+      "Marmato — Caldas", "Marquetalia — Caldas", "Marsella — Risaralda", "Marulanda — Caldas",
+      "Matanza — Santander", "Medellín — Antioquia", "Medina — Cundinamarca", "Medio Atrato — Chocó",
+      "Medio Baudó — Chocó", "Medio San Juan — Chocó", "Melgar — Tolima", "Mercaderes — Cauca",
+      "Mesetas — Meta", "Milán — Caquetá", "Miraflores — Boyacá", "Miraflores — Guaviare",
+      "Miraflores — Santander", "Miranda — Cauca", "Mistrató — Risaralda", "Mitú — Vaupés",
+      "Mogotes — Santander", "Molagavita — Santander", "Momil — Córdoba", "Mompós — Bolívar",
+      "Mongua — Boyacá", "Monguí — Boyacá", "Moniquirá — Boyacá", "Montebello — Antioquia",
+      "Montecristo — Bolívar", "Montenegro — Quindío", "Montería — Córdoba", "Montelíbano — Córdoba",
+      "Morelia — Caquetá", "Mosquera — Cundinamarca", "Mosquera — Nariño", "Motavita — Boyacá",
+      "Murillo — Tolima", "Murindó — Antioquia", "Mutatá — Antioquia", "Mutiscua — Norte de Santander",
+      "Nariño — Antioquia", "Nariño — Cundinamarca", "Nariño — Nariño", "Natagaima — Tolima",
+      "Nechí — Antioquia", "Neira — Caldas", "Neiva — Huila", "Nemocón — Cundinamarca", "Nilo — Cundinamarca",
+      "Nimaima — Cundinamarca", "Nobsa — Boyacá", "Nocaima — Cundinamarca", "Norcasia — Caldas",
+      "Nóvita — Chocó", "Nueva Granada — Magdalena", "Nuevo Colón — Boyacá", "Nunchía — Casanare",
+      "Nuquí — Chocó", "Ocamonte — Santander", "Ocaña — Norte de Santander", "Oiba — Santander",
+      "Oicatá — Boyacá", "Olaya — Antioquia", "Olaya Herrera — Nariño", "Onzaga — Santander",
+      "Oporapa — Huila", "Orito — Putumayo", "Orocué — Casanare", "Ortega — Tolima", "Ospina — Nariño",
+      "Otanche — Boyacá", "Ovejas — Sucre", "Pacho — Cundinamarca", "Paicol — Huila", "Pailitas — Cesar",
+      "Paime — Cundinamarca", "Paipa — Boyacá", "Pajarito — Boyacá", "Palermo — Huila", "Palestina — Caldas",
+      "Palestina — Huila", "Palmar — Santander", "Palmar de Varela — Atlántico", "Palocabildo — Tolima",
+      "Pamplona — Norte de Santander", "Pamplonita — Norte de Santander", "Pandi — Cundinamarca",
+      "Panqueba — Boyacá", "Páramo — Santander", "Paratebueno — Cundinamarca", "Pasca — Cundinamarca",
+      "Pasto — Nariño", "Patía — Cauca", "Pauna — Boyacá", "Paya — Boyacá", "Paz de Ariporo — Casanare",
+      "Paz de Río — Boyacá", "Pelaya — Cesar", "Pensilvania — Caldas", "Peñol — Antioquia",
+      "Pereira — Risaralda", "Pesca — Boyacá", "Piamonte — Cauca", "Piedecuesta — Santander",
+      "Piedras — Tolima", "Piendamó — Cauca", "Pijao — Quindío", "Pijiño del Carmen — Magdalena",
+      "Pinchote — Santander", "Pinillos — Bolívar", "Piojó — Atlántico", "Pisba — Boyacá",
+      "Pital — Huila", "Pitalito — Huila", "Pivijay — Magdalena", "Planadas — Tolima",
+      "Planeta Rica — Córdoba", "Plato — Magdalena", "Policarpa — Nariño", "Polonuevo — Atlántico",
+      "Ponedera — Atlántico", "Popayán — Cauca", "Pore — Casanare", "Potosí — Nariño", "Prado — Tolima",
+      "Providencia — San Andrés, Providencia y Santa Catalina", "Pueblo Bello — Cesar", "Pueblo Nuevo — Córdoba",
+      "Pueblo Rico — Risaralda", "Pueblorrico — Antioquia", "Puente Nacional — Santander", "Puerres — Nariño",
+      "Puerto Asís — Putumayo", "Puerto Berrío — Antioquia", "Puerto Boyacá — Boyacá", "Puerto Caicedo — Putumayo",
+      "Puerto Carreño — Vichada", "Puerto Colombia — Atlántico", "Puerto Concordia — Meta",
+      "Puerto Escondido — Córdoba", "Puerto Gaitán — Meta", "Puerto Guzmán — Putumayo",
+      "Puerto Leguízamo — Putumayo", "Puerto Libertador — Córdoba", "Puerto Lleras — Meta",
+      "Puerto López — Meta", "Puerto Nare — Antioquia", "Puerto Nariño — Amazonas", "Puerto Parra — Santander",
+      "Puerto Rico — Caquetá", "Puerto Rico — Meta", "Puerto Rondón — Arauca", "Puerto Salgar — Cundinamarca",
+      "Puerto Santander — Norte de Santander", "Puerto Tejada — Cauca", "Puerto Triunfo — Antioquia",
+      "Puerto Wilches — Santander", "Pulí — Cundinamarca", "Pupiales — Nariño", "Puracé — Cauca",
+      "Purificación — Tolima", "Purísima — Córdoba", "Quebradanegra — Cundinamarca", "Quetame — Cundinamarca",
+      "Quibdó — Chocó", "Quimbaya — Quindío", "Quinchía — Risaralda", "Quípama — Boyacá",
+      "Quipile — Cundinamarca", "Ragonvalia — Norte de Santander", "Ramiriquí — Boyacá", "Recetor — Casanare",
+      "Regidor — Bolívar", "Remedios — Antioquia", "Remolino — Magdalena", "Repelón — Atlántico",
+      "Restrepo — Meta", "Restrepo — Valle del Cauca", "Retiro — Antioquia", "Ricaurte — Cundinamarca",
+      "Ricaurte — Nariño", "Río de Oro — Cesar", "Río Iro — Chocó", "Río Quito — Chocó", "Río Sucio — Chocó",
+      "Río Viejo — Bolívar", "Rioblanco — Tolima", "Riofrío — Valle del Cauca", "Riohacha — La Guajira",
+      "Rionegro — Antioquia", "Rionegro — Santander", "Riosucio — Caldas", "Risaralda — Caldas",
+      "Rivera — Huila", "Roldanillo — Valle del Cauca", "Roncesvalles — Tolima", "Rondon — Boyacá",
+      "Rosas — Cauca", "Rovira — Tolima", "Sabana de Torres — Santander", "Sabanagrande — Atlántico",
+      "Sabanalarga — Antioquia", "Sabanalarga — Atlántico", "Sabanalarga — Casanare", "Sabaneta — Antioquia",
+      "Saboyá — Boyacá", "Sácama — Casanare", "Sáchica — Boyacá", "Sahagún — Córdoba", "Salamina — Caldas",
+      "Salamina — Magdalena", "Salazar — Norte de Santander", "Saldaña — Tolima", "Salento — Quindío",
+      "Salgar — Antioquia", "Samacá — Boyacá", "Samaná — Caldas", "Sampués — Sucre", "San Agustín — Huila",
+      "San Alberto — Cesar", "San Andrés — San Andrés, Providencia y Santa Catalina",
+      "San Andrés de Cuerquia — Antioquia", "San Andrés de Sotavento — Córdoba", "San Antero — Córdoba",
+      "San Antonio — Tolima", "San Antonio de Tequendama — Cundinamarca", "San Benito — Santander",
+      "San Benito Abad — Sucre", "San Bernardo — Cundinamarca", "San Bernardo — Nariño",
+      "San Bernardo del Viento — Córdoba", "San Calixto — Norte de Santander", "San Carlos — Antioquia",
+      "San Carlos — Córdoba", "San Carlos de Guaroa — Meta", "San Cayetano — Cundinamarca",
+      "San Cayetano — Norte de Santander", "San Cristóbal — Bolívar", "San Diego — Cesar",
+      "San Eduardo — Boyacá", "San Estanislao — Bolívar", "San Fernando — Bolívar", "San Francisco — Antioquia",
+      "San Francisco — Cundinamarca", "San Francisco — Putumayo", "San Gil — Santander",
+      "San Jacinto — Bolívar", "San Jacinto del Cauca — Bolívar", "San Jerónimo — Antioquia",
+      "San Joaquín — Santander", "San José — Caldas", "San José de la Montaña — Antioquia",
+      "San José de Miranda — Santander", "San José de Pare — Boyacá", "San José de Uré — Córdoba",
+      "San José del Fragua — Caquetá", "San José del Guaviare — Guaviare", "San José del Palmar — Chocó",
+      "San Juan de Arama — Meta", "San Juan de Betulia — Sucre", "San Juan de Nepomuceno — Bolívar",
+      "San Juan de Río Seco — Cundinamarca", "San Juan de Urabá — Antioquia", "San Juan del Cesar — La Guajira",
+      "San Juanito — Meta", "San Lorenzo — Nariño", "San Luis — Antioquia", "San Luis — Tolima",
+      "San Luis de Gaceno — Boyacá", "San Luis de Palenque — Casanare", "San Marcos — Sucre",
+      "San Martín — Cesar", "San Martín — Meta", "San Martín de Loba — Bolívar", "San Mateo — Boyacá",
+      "San Miguel — Putumayo", "San Miguel de Sema — Boyacá", "San Onofre — Sucre", "San Pablo — Bolívar",
+      "San Pablo — Nariño", "San Pablo de Borbur — Boyacá", "San Pedro — Antioquia", "San Pedro — Sucre",
+      "San Pedro de Cartago — Nariño", "San Pedro de los Milagros — Antioquia", "San Pedro de Urabá — Antioquia",
+      "San Pelayo — Córdoba", "San Rafael — Antioquia", "San Roque — Antioquia", "San Sebastián — Cauca",
+      "San Sebastián de Buenavista — Magdalena", "San Vicente — Antioquia", "San Vicente de Chucurí — Santander",
+      "San Vicente del Caguán — Caquetá", "San Zenón — Magdalena", "Sandoná — Nariño", "Santa Ana — Magdalena",
+      "Santa Bárbara — Antioquia", "Santa Bárbara — Santander", "Santa Bárbara de Pinto — Magdalena",
+      "Santa Catalina — Bolívar", "Santa Fe de Antioquia — Antioquia", "Santa Genoveva de Docordó — Chocó",
+      "Santa Helena del Opón — Santander", "Santa Isabel — Tolima", "Santa Lucía — Atlántico",
+      "Santa María — Boyacá", "Santa María — Huila", "Santa Marta — Magdalena", "Santa Rosa — Bolívar",
+      "Santa Rosa — Cauca", "Santa Rosa de Cabal — Risaralda", "Santa Rosa de Osos — Antioquia",
+      "Santa Rosa de Viterbo — Boyacá", "Santa Rosa del Sur — Bolívar", "Santa Rosalía — Vichada",
+      "Santa Sofía — Boyacá", "Santander de Quilichao — Cauca", "Santiago — Norte de Santander",
+      "Santiago de Tolú — Sucre", "Santo Domingo — Antioquia", "Santo Tomás — Atlántico",
+      "Santuario — Antioquia", "Santuario — Risaralda", "Sapuyes — Nariño", "Saravena — Arauca",
+      "Sardinata — Norte de Santander", "Sasaima — Cundinamarca", "Sativanorte — Boyacá",
+      "Sativasur — Boyacá", "Segovia — Antioquia", "Sesquilé — Cundinamarca", "Sevilla — Valle del Cauca",
+      "Siachoque — Boyacá", "Sibundoy — Putumayo", "Sibaté — Cundinamarca", "Silos — Norte de Santander",
+      "Silvania — Cundinamarca", "Simacota — Santander", "Simijaca — Cundinamarca", "Simití — Bolívar",
+      "Sincelejo — Sucre", "Sipí — Chocó", "Sitionuevo — Magdalena", "Soacha — Cundinamarca",
+      "Soatá — Boyacá", "Socha — Boyacá", "Socorro — Santander", "Socotá — Boyacá", "Sogamoso — Boyacá",
+      "Solano — Caquetá", "Soledad — Atlántico", "Solita — Caquetá", "Somondoco — Boyacá",
+      "Sonsón — Antioquia", "Sopetrán — Antioquia", "Soplaviento — Bolívar", "Sopó — Cundinamarca",
+      "Sora — Boyacá", "Soracá — Boyacá", "Sotaquirá — Boyacá", "Suaita — Santander", "Suan — Atlántico",
+      "Suárez — Cauca", "Suárez — Tolima", "Suaza — Huila", "Subachoque — Cundinamarca", "Sucre — Cauca",
+      "Sucre — Santander", "Sucre — Sucre", "Suesca — Cundinamarca", "Supatá — Cundinamarca",
+      "Supía — Caldas", "Suratá — Santander", "Susacón — Boyacá", "Sutamarchán — Boyacá",
+      "Sutatausa — Cundinamarca", "Sutatenza — Boyacá", "Tabio — Cundinamarca", "Tadó — Chocó",
+      "Talaigua Nuevo — Bolívar", "Tame — Arauca", "Támara — Casanare", "Taminango — Nariño",
+      "Tangua — Nariño", "Taraira — Vaupés", "Tarapacá — Amazonas", "Tarazá — Antioquia",
+      "Tarqui — Huila", "Tarso — Antioquia", "Tausa — Cundinamarca", "Tello — Huila", "Tena — Cundinamarca",
+      "Tenerife — Magdalena", "Tenjo — Cundinamarca", "Tenza — Boyacá", "Teorama — Norte de Santander",
+      "Teruel — Huila", "Tesalia — Huila", "Tibaná — Boyacá", "Tibasosa — Boyacá", "Tibirita — Cundinamarca",
+      "Tibú — Norte de Santander", "Tierralta — Córdoba", "Timaná — Huila", "Timbiquí — Cauca",
+      "Timbío — Cauca", "Tinjacá — Boyacá", "Tipacoque — Boyacá", "Tiquisio — Bolívar", "Titiribí — Antioquia",
+      "Toca — Boyacá", "Tocaima — Cundinamarca", "Tocancipá — Cundinamarca", "Togüí — Boyacá",
+      "Toledo — Antioquia", "Toledo — Norte de Santander", "Tolú — Sucre", "Tolú Viejo — Sucre",
+      "Tona — Santander", "Tópaga — Boyacá", "Topaipí — Cundinamarca", "Toribío — Cauca",
+      "Toro — Valle del Cauca", "Tota — Boyacá", "Totoró — Cauca", "Trinidad — Casanare",
+      "Trujillo — Valle del Cauca", "Tubará — Atlántico", "Túquerres — Nariño", "Turbaco — Bolívar",
+      "Turbaná — Bolívar", "Turmequé — Boyacá", "Tuta — Boyacá", "Tutazá — Boyacá", "Ubalá — Cundinamarca",
+      "Ubaque — Cundinamarca", "Ubaté — Cundinamarca", "Ulloa — Valle del Cauca", "Umbita — Boyacá",
+      "Une — Cundinamarca", "Unguía — Chocó", "Unión Panamericana — Chocó", "Uramita — Antioquia",
+      "Uribe — Meta", "Uribia — La Guajira", "Urrao — Antioquia", "Urumita — La Guajira",
+      "Usme — Bogotá, D. C.", "Útica — Cundinamarca", "Valdivia — Antioquia", "Valparaíso — Antioquia",
+      "Valparaíso — Caquetá", "Valle de San José — Santander", "Valle de San Juan — Tolima",
+      "Valledupar — Cesar", "Valledel Guamuez — Putumayo", "Vegachí — Antioquia", "Vélez — Santander",
+      "Venadillo — Tolima", "Venecia — Antioquia", "Venecia — Cundinamarca", "Ventaquemada — Boyacá",
+      "Vergara — Cundinamarca", "Versalles — Valle del Cauca", "Vetas — Santander", "Vianí — Cundinamarca",
+      "Victoria — Caldas", "Vigía del Fuerte — Antioquia", "Vijes — Valle del Cauca",
+      "Villa Caro — Norte de Santander", "Villa de Leyva — Boyacá", "Villa de San Diego de Ubaté — Cundinamarca",
+      "Villa del Rosario — Norte de Santander", "Villa Rica — Cauca", "Villagarzón — Putumayo",
+      "Villagómez — Cundinamarca", "Villahermosa — Tolima", "Villamaría — Caldas", "Villanueva — Bolívar",
+      "Villanueva — Casanare", "Villanueva — La Guajira", "Villanueva — Santander",
+      "Villapinzón — Cundinamarca", "Villarrica — Tolima", "Villavicencio — Meta", "Villavieja — Huila",
+      "Villeta — Cundinamarca", "Viotá — Cundinamarca", "Viracachá — Boyacá", "Vistahermosa — Meta",
+      "Viterbo — Caldas", "Yacopí — Cundinamarca", "Yacuanquer — Nariño", "Yaguará — Huila",
+      "Yalí — Antioquia", "Yarumal — Antioquia", "Yavaraté — Vaupés", "Yolombó — Antioquia",
+      "Yondó — Antioquia", "Yopal — Casanare", "Yotoco — Valle del Cauca", "Yumbo — Valle del Cauca",
+      "Zapatoca — Santander", "Zapayán — Magdalena", "Zaragoza — Antioquia", "Zetaquira — Boyacá",
+      "Zipacón — Cundinamarca", "Zipaquirá — Cundinamarca", "Zona Bananera — Magdalena"
+    ];
+
+    const colombiaMap = {};
+    rawData.forEach(item => {
+      const parts = item.split("—");
+      if (parts.length === 2) {
+        const city = parts[0].trim();
+        const dept = parts[1].trim();
+        if (!colombiaMap[dept]) colombiaMap[dept] = [];
+        if (!colombiaMap[dept].includes(city)) colombiaMap[dept].push(city);
+      }
+    });
+
+    const defaultProducts = [
+      { id: 1, name: "Guardabarro — Diseño 1", tag: "GUARDABARRO", price: "120000", img: "", outOfStock: false },
+      { id: 2, name: "Guardabarro — Diseño 2", tag: "GUARDABARRO", price: "120000", img: "", outOfStock: false },
+      { id: 3, name: "Guardabarro — Diseño 3", tag: "GUARDABARRO", price: "120000", img: "", outOfStock: false },
+      { id: 4, name: "Tanque — Diseño 1", tag: "TANQUE", price: "180000", img: "", outOfStock: false }
+    ];
+
+    let products = JSON.parse(localStorage.getItem('edwin_products')) || defaultProducts;
+    let globalShopify = localStorage.getItem('edwin_global_shopify') || "";
+
+    function saveProductsToStorage() {
+      localStorage.setItem('edwin_products', JSON.stringify(products));
+    }
+
+    let activeEditingId = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const intro = document.getElementById("introScreen");
+        if (intro) intro.classList.add("hide");
+      }, 2800);
+
+      renderProducts();
+      initColombiaSelects();
+
+      const sections = document.querySelectorAll("section");
+      const navLinks = document.querySelectorAll(".nav-link");
+
+      window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach((sec) => {
+          const top = sec.offsetTop - 180;
+          if (window.scrollY >= top) {
+            current = sec.getAttribute("id");
+          }
+        });
+        navLinks.forEach((link) => {
+          link.classList.remove("active");
+          if (link.getAttribute("href") === `#${current}`) {
+            link.classList.add("active");
+          }
+        });
+      });
+    });
+
+    function formatPriceDisplay(priceVal) {
+      if (!priceVal) return "Consultar precio";
+      const num = parseFloat(priceVal);
+      if (!isNaN(num) && /^\d+$/.test(String(priceVal).trim())) {
+        return `$${num.toLocaleString('es-CO')}`;
+      }
+      return priceVal;
+    }
+
+    function initColombiaSelects() {
+      const deptSelect = document.getElementById("cDepartment");
+      if (!deptSelect) return;
+
+      const depts = Object.keys(colombiaMap).sort();
+      depts.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        deptSelect.appendChild(opt);
+      });
+    }
+
+    function onDeptChange() {
+      const deptSelect = document.getElementById("cDepartment");
+      const cityInput = document.getElementById("cCity");
+      const cityList = document.getElementById("cityOptions");
+      const selectedDept = deptSelect.value;
+
+      cityList.innerHTML = "";
+      cityInput.value = "";
+
+      if (selectedDept && colombiaMap[selectedDept]) {
+        cityInput.disabled = false;
+        cityInput.placeholder = "Selecciona de la lista o escribe tu ciudad...";
+
+        const cities = colombiaMap[selectedDept].sort();
+        cities.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          cityList.appendChild(opt);
+        });
+      } else {
+        cityInput.disabled = true;
+        cityInput.placeholder = "Selecciona primero un departamento...";
+      }
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = products.map(p => `
+        <div class="catalog-card">
+          <div class="product-img-box">
+            ${p.img ? `<img src="${p.img}" alt="${p.name}" />` : 'PRODUCTO A ESPERA DE FOTO'}
+            ${p.outOfStock ? `<div class="out-of-stock-badge">Agotado</div>` : ''}
+          </div>
+          <span class="product-tag">${p.tag}</span>
+          <h3 class="product-name">${p.name}</h3>
+          <p class="product-price">${formatPriceDisplay(p.price)}</p>
+
+          <div class="card-actions">
+            <button class="btn-details" onclick="openDetailsModal(${p.id})">Ver detalles</button>
+            <button class="btn-add-cart" ${p.outOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', '${p.price}')">
+              ${p.outOfStock ? 'Agotado' : 'Añadir'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openDetailsModal(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('dTag').textContent = p.tag;
+      document.getElementById('dTitle').textContent = p.name;
+      document.getElementById('dPrice').textContent = formatPriceDisplay(p.price);
+      
+      const imgContainer = document.getElementById('dImgContainer');
+      imgContainer.innerHTML = p.img 
+        ? `<img src="${p.img}" alt="${p.name}" />` 
+        : 'PRODUCTO A ESPERA DE FOTO';
+
+      const addBtn = document.getElementById('dAddBtn');
+      addBtn.disabled = p.outOfStock;
+      addBtn.textContent = p.outOfStock ? 'Agotado' : 'Añadir al Carrito';
+      addBtn.onclick = () => {
+        addToCart(p.name, p.price);
+        closeSysModals();
+      };
+
+      const onlinePayContainer = document.getElementById('dOnlinePayContainer');
+      if (globalShopify && globalShopify.trim() !== '') {
+        onlinePayContainer.innerHTML = `
+          <a href="${globalShopify}" target="_blank" class="sign-in-btn" style="width:100%; padding:12px; background:rgba(0,158,227,0.2); border-color:#009ee3; text-align:center; display:block; text-decoration:none;">
+            <i class="fa-solid fa-credit-card"></i> &nbsp;Pagar Online (Shopify)
+          </a>
+        `;
+      } else {
+        onlinePayContainer.innerHTML = '';
+      }
+
+      openSysModal('detailsModal');
+    }
+
+    function showToast(msg, icon = 'fa-circle-check') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fa-solid ${icon}" style="color:var(--red);"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+      
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    let cart = [];
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      updateCart();
+      showToast(`" ${name} " se añadió al carrito.`);
+    }
+
+    function updateCart() {
+      document.getElementById('cartCount').textContent = cart.length;
+      const container = document.getElementById('cartItems');
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="color:#888; font-size:13px;">Tu carrito está vacío.</p>';
+      } else {
+        container.innerHTML = cart.map(item => `
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span>${item.name}</span>
+            <span>${formatPriceDisplay(item.price)}</span>
+          </div>
+        `).join('');
+      }
+      
+      let numericTotal = 0;
+      cart.forEach(item => {
+        const val = parseFloat(item.price);
+        if (!isNaN(val) && /^\d+$/.test(String(item.price).trim())) {
+          numericTotal += val;
+        }
+      });
+
+      document.getElementById('cartSubtotal').textContent = numericTotal > 0 
+        ? `$${numericTotal.toLocaleString('es-CO')}` 
+        : 'Consultar por WhatsApp';
+    }
+
+    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (cart.length === 0) { 
+        showToast('Añade productos antes de continuar', 'fa-triangle-exclamation'); 
+        return; 
+      }
+      const name = document.getElementById('cName').value;
+      const phone = document.getElementById('cPhone').value;
+      const dept = document.getElementById('cDepartment').value;
+      const city = document.getElementById('cCity').value;
+      const address = document.getElementById('cAddress').value;
+      const payment = document.getElementById('cPayment').value;
+
+      const msg = `Hola Edwin, quiero realizar el siguiente pedido:\n\n${cart.map(i => '- ' + i.name + ' (' + formatPriceDisplay(i.price) + ')').join('\n')}\n\n*Datos del Cliente:*\n👤 Nombre: ${name}\n📞 Teléfono: ${phone}\n📍 Ubicación: ${city}, ${dept}\n🏠 Dirección: ${address}\n💳 Pago: ${payment}`;
+      
+      window.open(`https://wa.me/573116945695?text=${encodeURIComponent(msg)}`, '_blank');
+      cart = [];
+      updateCart();
+      closeSysModals();
+    });
+
+    function payCartOnline() {
+      if (cart.length === 0) {
+        showToast('El carrito está vacío', 'fa-triangle-exclamation');
+        return;
+      }
+      if (globalShopify && globalShopify.trim() !== '') {
+        window.open(globalShopify, '_blank');
+      } else {
+        showToast('No hay un link de Shopify configurado', 'fa-triangle-exclamation');
+        return;
+      }
+      showToast('Redirigiendo a Shopify...');
+      closeSysModals();
+    }
+
+    function loginAdmin() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === '2006ED') {
+        document.getElementById('adminLoginView').style.display = 'none';
+        document.getElementById('adminDashboardView').style.display = 'flex';
+        document.getElementById('globalShopifyLink').value = globalShopify;
+        renderAdminList();
+        showToast('Sesión de administración iniciada');
+      } else {
+        showToast('Contraseña incorrecta', 'fa-circle-xmark');
+      }
+    }
+
+    function saveGlobalShopify() {
+      const val = document.getElementById('globalShopifyLink').value;
+      globalShopify = val.trim();
+      localStorage.setItem('edwin_global_shopify', globalShopify);
+      showToast('Link de Shopify guardado correctamente');
+    }
+
+    function renderAdminList() {
+      const list = document.getElementById('adminProdList');
+      list.innerHTML = products.map(p => `
+        <div class="admin-prod-item">
+          <div>
+            <strong>${p.name}</strong> — ${formatPriceDisplay(p.price)}
+            <span style="font-size:10px; color:${p.outOfStock ? 'var(--red)' : '#4caf50'}">(${p.outOfStock ? 'AGOTADO' : 'DISPONIBLE'})</span>
+          </div>
+          <div class="admin-prod-actions">
+            <button class="btn-sm btn-sm-edit" onclick="openCustomPriceModal(${p.id})">Editar</button>
+            <button class="btn-sm btn-sm-toggle" onclick="toggleStock(${p.id})">${p.outOfStock ? 'Activo' : 'Agotar'}</button>
+            <button class="btn-sm btn-sm-del" onclick="deleteProd(${p.id})">X</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addNewProduct() {
+      const name = document.getElementById('newProdName').value;
+      const price = document.getElementById('newProdPrice').value || "Consultar precio";
+      const tag = document.getElementById('newProdTag').value || 'CUSTOM';
+      const urlInput = document.getElementById('newProdUrl').value;
+
+      if (!name) {
+        showToast('Ingresa al menos el nombre del producto', 'fa-triangle-exclamation');
+        return;
+      }
+
+      products.push({
+        id: Date.now(),
+        name,
+        tag: tag.toUpperCase(),
+        price,
+        img: urlInput.trim(),
+        outOfStock: false
+      });
+
+      saveProductsToStorage();
+      renderProducts();
+      renderAdminList();
+      showToast('Producto añadido con éxito');
+
+      document.getElementById('newProdName').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdTag').value = '';
+      document.getElementById('newProdUrl').value = '';
+    }
+
+    function openCustomPriceModal(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+
+      activeEditingId = id;
+      document.getElementById('cpTitle').textContent = `Editar "${p.name}"`;
+      document.getElementById('cpNameInput').value = p.name;
+      document.getElementById('cpTagInput').value = p.tag;
+      document.getElementById('cpInput').value = p.price;
+      document.getElementById('cpStockSelect').value = p.outOfStock ? 'outOfStock' : 'available';
+      document.getElementById('cpImgUrl').value = p.img || '';
+      
+      document.getElementById('adminModal').classList.remove('active');
+      const editModal = document.getElementById('customPriceModal');
+      if (editModal) editModal.classList.add('active');
+    }
+
+    function closeEditModal() {
+      const editModal = document.getElementById('customPriceModal');
+      if (editModal) editModal.classList.remove('active');
+      const adminModal = document.getElementById('adminModal');
+      if (adminModal) adminModal.classList.add('active');
+    }
+
+    function saveCustomPrice() {
+      if (!activeEditingId) return;
+      const p = products.find(x => x.id === activeEditingId);
+      if (p) {
+        const nameVal = document.getElementById('cpNameInput').value;
+        const tagVal = document.getElementById('cpTagInput').value;
+        const val = document.getElementById('cpInput').value;
+        const stockVal = document.getElementById('cpStockSelect').value;
+        const urlVal = document.getElementById('cpImgUrl').value;
+
+        if (nameVal.trim() !== "") p.name = nameVal.trim();
+        if (tagVal.trim() !== "") p.tag = tagVal.trim().toUpperCase();
+        p.price = val.trim() !== "" ? val : "Consultar precio";
+        p.outOfStock = (stockVal === 'outOfStock');
+        p.img = urlVal.trim();
+
+        saveProductsToStorage();
+        renderProducts();
+        renderAdminList();
+        showToast('Producto actualizado correctamente');
+      }
+      closeEditModal();
+    }
+
+    function toggleStock(id) {
+      const p = products.find(x => x.id === id);
+      if (p) {
+        p.outOfStock = !p.outOfStock;
+        saveProductsToStorage();
+        renderProducts();
+        renderAdminList();
+        showToast(`Producto marcado como ${p.outOfStock ? 'Agotado' : 'Disponible'}`);
+      }
+    }
+
+    function deleteProd(id) {
+      if (confirm('¿Deseas eliminar este producto del catálogo?')) {
+        products = products.filter(x => x.id !== id);
+        saveProductsToStorage();
+        renderProducts();
+        renderAdminList();
+        showToast('Producto eliminado');
+      }
+    }
+
+    function openSysModal(id) {
+      closeSysModals();
+      const m = document.getElementById(id);
+      if (m) m.classList.add('active');
+    }
+
+    function closeSysModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+    }
+  </script>
+</body>
+</html>
