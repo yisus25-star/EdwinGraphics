@@ -42,7 +42,7 @@ async function actualizar(id, campos) {
   const permitidas = new Set(["nombre", "descripcion", "parent_id"]);
   const camposValidos = claves.filter((clave) => permitidas.has(clave));
   if (!camposValidos.length) return obtenerPorId(id);
-  const asignaciones = camposValidos.map((clave, indice) => `${clave} = ${indice + 1}`);
+    const asignaciones = camposValidos.map((clave, indice) => `${clave} = $${indice + 1}`);
   const valores = camposValidos.map((clave) => campos[clave]);
 
   const consulta = `
