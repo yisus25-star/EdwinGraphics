@@ -1703,19 +1703,26 @@
         envio: 0,
         items: cart.map(item => ({ producto_id: item.producto_id, cantidad: item.cantidad }))
       };
+      let createdOrderId = null;
       const submitButton = event.submitter || document.querySelector('#checkoutForm button[type="submit"]');
       if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Creando pedido…'; }
       try {
         const order = await apiRequest('/pedidos', { method: 'POST', body: JSON.stringify(payload) });
+        createdOrderId = order.id;
         const checkout = await apiRequest('/pedidos/' + order.id + '/checkout', { method: 'POST', body: JSON.stringify({}) });
         if (!checkout.checkoutUrl) throw new Error('El pedido se creó, pero Shopify no devolvió un enlace de pago. Contacta soporte con el pedido #' + order.id + '.');
         cart = [];
         updateCart();
         closeSysModals();
-        showToast('Pedido #' + order.id + ' creado. Abriendo el pago seguro…');
-        window.location.href = checkout.checkoutUrl;
+        if (String(checkout.checkoutUrl).includes('checkout.simulado.local')) {
+          showToast('Pedido #' + order.id + ' creado en modo de prueba. No se realizó ningún cobro.');
+          alert('Modo de prueba\n\nPedido #' + order.id + ' creado correctamente.\nNo se realizó ningún cobro.\n\nPara recibir pagos reales, configura Shopify en el backend.');
+        } else {
+          showToast('Pedido #' + order.id + ' creado. Abriendo el pago seguro…');
+          window.location.href = checkout.checkoutUrl;
+        }
       } catch (error) {
-        showToast(error.message, 'fa-triangle-exclamation');
+        showToast((createdOrderId ? 'Pedido #' + createdOrderId + ' creado, pero no se pudo abrir el pago: ' : '') + error.message, 'fa-triangle-exclamation');
       } finally {
         if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fa-solid fa-lock"></i> &nbsp;Crear pedido y pagar'; }
       }
