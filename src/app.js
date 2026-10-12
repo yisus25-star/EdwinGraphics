@@ -31,7 +31,7 @@ app.use(express.json());
 
 // Archivos de imágenes subidos localmente (Multer). Si en el futuro se
 // usa Cloudinary, esta línea deja de ser necesaria pero no afecta nada.
-app.use(envConfig.uploads.baseUrl, express.static(path.join(process.cwd(), envConfig.uploads.dir)));
+app.use(envConfig.uploads.baseUrl, express.static(path.join(process.cwd(), envConfig.uploads.dir), { maxAge: "7d", immutable: true }));
 
 // ==========================
 // Rutas
