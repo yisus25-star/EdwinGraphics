@@ -47,7 +47,8 @@ function construirFiltros({ categoriaId, estado, q }) {
 
   if (q) {
     valores.push(`%${q}%`);
-    condiciones.push(`(p.nombre ILIKE $${valores.length} OR p.descripcion ILIKE $${valores.length} OR array_to_string(COALESCE(p.compatibilidad_moto, ARRAY[]::TEXT[]), ' ') ILIKE $${valores.length} OR EXISTS (SELECT 1 FROM categorias c WHERE c.id = p.categoria_id AND c.nombre ILIKE $${valores.length}))`);
+    const parametro = "$" + valores.length;
+    condiciones.push(`(p.nombre ILIKE ${parametro} OR p.descripcion ILIKE ${parametro} OR array_to_string(COALESCE(p.compatibilidad_moto, ARRAY[]::TEXT[]), ' ') ILIKE ${parametro} OR EXISTS (SELECT 1 FROM categorias c WHERE c.id = p.categoria_id AND c.nombre ILIKE ${parametro}))`);
   }
 
   const clausula = condiciones.length ? `WHERE ${condiciones.join(" AND ")}` : "";
