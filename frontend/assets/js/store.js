@@ -276,6 +276,7 @@
     let globalShopify = '';
     let activeEditingId = null;
     let apiReady = false;
+    let detailQuantity = 1;
 
     async function apiRequest(path, options = {}) {
       const headers = new Headers(options.headers || {});
@@ -363,6 +364,13 @@
 
     function renderCategoryControls() {
       const filter = document.getElementById('catalogCategory');
+      const motoFilter = document.getElementById('catalogMoto');
+      if (motoFilter) {
+        const selectedMoto = motoFilter.value;
+        const motos = [...new Set(products.flatMap(product => product.compatibilidadMoto || []))].filter(Boolean).sort((a,b) => a.localeCompare(b, 'es'));
+        motoFilter.innerHTML = '<option value="">Todos los modelos</option>' + motos.map(moto => '<option value="' + escapeHtml(moto) + '">' + escapeHtml(moto) + '</option>').join('');
+        motoFilter.value = motos.includes(selectedMoto) ? selectedMoto : '';
+      }
       const adminSelect = document.getElementById('newProdTag');
       const parentSelect = document.getElementById('newCategoryParent');
       const selected = filter?.value || '';
@@ -446,6 +454,9 @@
       initColombiaSelects();
       document.getElementById('catalogSearch')?.addEventListener('input', renderProducts);
       document.getElementById('catalogCategory')?.addEventListener('change', renderProducts);
+      document.getElementById('catalogMoto')?.addEventListener('change', renderProducts);
+      document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
+      document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
       loadStorefront();
       const adminLoginView = document.getElementById('adminLoginView');
@@ -523,17 +534,27 @@
       if (!grid) return;
       const query = (document.getElementById('catalogSearch')?.value || '').trim().toLocaleLowerCase('es');
       const categoryId = document.getElementById('catalogCategory')?.value || '';
+      const moto = document.getElementById('catalogMoto')?.value || '';
+      const sort = document.getElementById('catalogSort')?.value || 'featured';
       const filtered = products.filter(product => {
-        const text = [product.name, product.tag, product.descripcion, ...(product.compatibilidadMoto || [])].join(' ').toLocaleLowerCase('es');
-        return (!query || text.includes(query)) && (!categoryId || String(product.categoria_id) === categoryId);
+        const compatibility = product.compatibilidadMoto || [];
+        const text = [product.name, product.tag, product.descripcion, ...compatibility].join(' ').toLocaleLowerCase('es');
+        return (!query || text.includes(query)) &&
+          (!categoryId || String(product.categoria_id) === categoryId) &&
+          (!moto || compatibility.some(value => String(value).toLocaleLowerCase('es') === moto.toLocaleLowerCase('es')));
       });
+      if (sort === 'name-asc') filtered.sort((a,b) => a.name.localeCompare(b.name, 'es'));
+      if (sort === 'price-asc') filtered.sort((a,b) => Number(a.price) - Number(b.price));
+      if (sort === 'price-desc') filtered.sort((a,b) => Number(b.price) - Number(a.price));
+      const count = document.getElementById('catalogResultCount');
+      if (count) count.textContent = filtered.length + (filtered.length === 1 ? ' producto encontrado' : ' productos encontrados');
       if (!filtered.length) {
-        grid.innerHTML = '<div class="no-products">' + (apiReady ? 'Todavía no hay productos que coincidan con tu búsqueda.' : 'El catálogo no está disponible.') + '</div>';
+        grid.innerHTML = '<div class="no-products">' + (apiReady ? 'No encontramos productos con esos filtros. Prueba otra búsqueda o limpia los filtros.' : 'El catálogo no está disponible.') + '</div>';
         return;
       }
       grid.innerHTML = filtered.map(product =>
         '<article class="catalog-card"><div class="product-img-box">' +
-        (product.img ? '<img loading="lazy" src="' + escapeHtml(product.img) + '" alt="' + escapeHtml(product.name) + '">' : '<div class="product-placeholder">EDWINGRAPHICS</div>') +
+        (product.img ? '<img loading="lazy" src="' + escapeHtml(mediaUrl(product.img)) + '" alt="' + escapeHtml(product.name) + '">' : '<div class="product-placeholder">EDWINGRAPHICS</div>') +
         (product.outOfStock ? '<span class="out-of-stock-badge">Agotado</span>' : '') +
         '</div><span class="product-tag">' + escapeHtml(product.tag) + '</span>' +
         '<h3 class="product-name">' + escapeHtml(product.name) + '</h3>' +
@@ -565,10 +586,25 @@
             '<img loading="lazy" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url)) + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src">'
           ).join('') + '</div>'
         : '<div class="product-placeholder">EDWINGRAPHICS</div>';
+      detailQuantity = 1;
+      const desc = document.getElementById('dDescription');
+      if (desc) {
+        let quantityControl = document.getElementById('detailQuantityControl');
+        if (!quantityControl) {
+          quantityControl = document.createElement('div');
+          quantityControl.id = 'detailQuantityControl';
+          quantityControl.className = 'quantity-control';
+          quantityControl.innerHTML = '<span>Cantidad</span><div class="quantity-stepper"><button type="button" id="detailQtyMinus" aria-label="Disminuir cantidad">−</button><output id="detailQtyValue" aria-live="polite">1</output><button type="button" id="detailQtyPlus" aria-label="Aumentar cantidad">+</button></div>';
+          desc.insertAdjacentElement('afterend', quantityControl);
+          document.getElementById('detailQtyMinus').addEventListener('click', () => { detailQuantity = Math.max(1, detailQuantity - 1); document.getElementById('detailQtyValue').textContent = detailQuantity; });
+          document.getElementById('detailQtyPlus').addEventListener('click', () => { detailQuantity = Math.min(99, detailQuantity + 1); document.getElementById('detailQtyValue').textContent = detailQuantity; });
+        }
+        document.getElementById('detailQtyValue').textContent = '1';
+      }
       const addButton = document.getElementById('dAddBtn');
       addButton.disabled = product.outOfStock;
       addButton.textContent = product.outOfStock ? 'Agotado' : 'Añadir al carrito';
-      addButton.onclick = () => { addToCartById(product.id); closeSysModals(); };
+      addButton.onclick = () => { addToCartById(product.id, detailQuantity); closeSysModals(); };
       const compatibility = product.compatibilidadMoto || [];
       const desc = document.getElementById('dDescription');
       if (desc) desc.textContent = (product.descripcion || '') + (compatibility.length ? '\n\nCompatible con: ' + compatibility.join(', ') : '');
@@ -594,17 +630,18 @@
       }, 3000);
     }
 
-    function addToCartById(id) {
+    function addToCartById(id, quantity = 1) {
       const product = products.find(item => item.id === Number(id));
-      if (product) addToCart(product.id, product.name, product.price);
+      if (product) addToCart(product.id, product.name, product.price, quantity);
     }
 
-    function addToCart(id, name, price) {
+    function addToCart(id, name, price, quantity = 1) {
       const product = products.find(item => item.id === Number(id));
       if (!product || product.outOfStock) return showToast('Este producto no está disponible.', 'fa-triangle-exclamation');
+      const amount = Math.max(1, Math.min(99, Number(quantity) || 1));
       const existing = cart.find(item => item.producto_id === product.id);
-      if (existing) existing.cantidad += 1;
-      else cart.push({ producto_id: product.id, nombre: product.name, precio: Number(price), cantidad: 1 });
+      if (existing) existing.cantidad += amount;
+      else cart.push({ producto_id: product.id, nombre: product.name, precio: Number(price), cantidad: amount });
       updateCart();
       showToast(product.name + ' se añadió al carrito.');
     }
