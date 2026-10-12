@@ -83,6 +83,15 @@ router.post(
 );
 
 router.put(
+  "/imagenes/:id/color",
+  authMiddleware,
+  adminMiddleware,
+  reglasActualizarColorNombre,
+  validateRequest,
+  imagenController.actualizarColorNombre
+);
+
+router.put(
   "/imagenes/:id/orden",
   authMiddleware,
   adminMiddleware,
