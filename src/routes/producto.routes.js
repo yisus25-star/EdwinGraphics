@@ -27,6 +27,7 @@ const router = express.Router();
 // Productos (públicos)
 // ==========================
 router.get("/", productoController.obtenerTodos);
+router.get("/mas-vendidos", productoController.masVendidos);
 router.get("/slug/:slug", productoController.obtenerPorSlug);
 router.get("/:id", reglasIdProducto, validateRequest, productoController.obtenerPorId);
 
