@@ -25,6 +25,7 @@
 
   <link rel="stylesheet" href="assets/css/store.css" />
   <link rel="stylesheet" href="assets/css/visual-refresh.css" />
+  <link rel="stylesheet" href="assets/css/admin-editor.css" />
 </head>
 <body class="page-admin">
 
@@ -243,34 +244,26 @@
     </div>
   </div>
 
-  <!-- MODAL: EDICIÓN DE PRODUCTO DENTRO DEL ADMIN -->
-  <div class="modal-backdrop" id="customPriceModal">
-    <div class="modal-card">
-      <button class="modal-close" onclick="closeEditModal()">&times;</button>
-      <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;" id="cpTitle">Modificar Producto</h3>
-      
-      <span class="field-label">Nombre del Producto:</span>
-      <input type="text" id="cpNameInput" placeholder="Nombre del producto" />
-
-      <span class="field-label">Descripción / Categoría:</span>
-      <input type="text" id="cpTagInput" placeholder="Categoría" />
-
-      <span class="field-label">Precio (Número o Texto):</span>
-      <input type="text" id="cpInput" placeholder="Ej: 150000 o Consultar" />
-
-      <span class="field-label">Estado:</span>
-      <select id="cpStockSelect">
-        <option value="available">Disponible</option>
-        <option value="outOfStock">Agotado</option>
-      </select>
-
-      <span class="field-label">Imagen del Producto (URL):</span>
-      <input type="text" id="cpImgUrl" placeholder="URLs de fotos separadas por coma (rojo, negro, detalle...)" />
-
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button onclick="saveCustomPrice()" class="btn-add-cart" style="flex:1;">Guardar cambios</button>
-        <button onclick="closeEditModal()" class="btn-details" style="flex:1;">Cancelar</button>
+  <!-- MODAL: EDICIÓN DE PRODUCTO -->
+  <div class="modal-backdrop" id="customPriceModal" role="dialog" aria-modal="true" aria-labelledby="cpTitle">
+    <div class="modal-card product-editor-modal">
+      <button type="button" class="modal-close" onclick="closeEditModal()" aria-label="Cerrar">&times;</button>
+      <div class="editor-heading"><span class="section-header-tag">INVENTARIO</span><h2 id="cpTitle">Editar producto</h2><p>Actualiza la información, administra las fotos y define qué imagen se muestra primero.</p></div>
+      <div class="editor-fields">
+        <div class="editor-field editor-field-wide"><label for="cpNameInput">Nombre del producto</label><input type="text" id="cpNameInput" placeholder="Ej. Kit gráfico Yamaha R15" required /></div>
+        <div class="editor-field"><label for="cpPriceInput">Precio (COP)</label><input type="number" id="cpPriceInput" min="0" step="1" required /></div>
+        <div class="editor-field"><label for="cpStockInput">Unidades disponibles</label><input type="number" id="cpStockInput" min="0" step="1" required /></div>
+        <div class="editor-field"><label for="cpCategorySelect">Categoría</label><select id="cpCategorySelect"></select></div>
+        <div class="editor-field"><label for="cpEstadoSelect">Estado</label><select id="cpEstadoSelect"><option value="true">Disponible</option><option value="false">Desactivado</option></select></div>
+        <div class="editor-field editor-field-wide"><label for="cpDescriptionInput">Descripción</label><textarea id="cpDescriptionInput" rows="4" placeholder="Describe el producto, acabado y contenido del kit"></textarea></div>
+        <div class="editor-field editor-field-wide"><label for="cpMotoInput">Motos compatibles</label><input type="text" id="cpMotoInput" placeholder="Yamaha R15, MT-15 (separadas por coma)" /></div>
       </div>
+      <section class="editor-images-section">
+        <div class="editor-section-title"><div><h3>Fotos y colores</h3><p>Selecciona la foto principal y conserva el orden de las variantes de color.</p></div><span id="cpImageCount" class="editor-count">0 fotos</span></div>
+        <div id="cpExistingImages" class="editor-image-grid"><p class="editor-empty">Cargando fotos del producto...</p></div>
+        <div class="editor-upload-row"><label class="editor-upload-label" for="cpNewImages"><i class="fa-solid fa-images"></i><span><strong>Añadir fotos</strong><small>JPG, PNG o WebP · hasta 10 por carga</small></span></label><input type="file" id="cpNewImages" accept="image/jpeg,image/png,image/webp" multiple /><button type="button" id="cpUploadImagesBtn" class="btn-details" onclick="uploadEditedProductImages()">Subir fotos</button></div>
+      </section>
+      <div class="editor-actions"><button type="button" onclick="closeEditModal()" class="btn-details">Cancelar</button><button type="button" id="cpSaveBtn" onclick="saveCustomPrice()" class="btn-add-cart"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button></div>
     </div>
   </div>
 
