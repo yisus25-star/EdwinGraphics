@@ -1579,6 +1579,7 @@
       const city = document.getElementById('cCity').value;
       const address = document.getElementById('cAddress').value;
       const payment = document.getElementById('cPayment').value;
+      const observations = document.getElementById('cObservations')?.value.trim() || '';
 
       const msg = `Hola Edwin, quiero realizar el siguiente pedido:\n\n${cart.map(i => '- ' + i.name + ' (' + formatPriceDisplay(i.price) + ')').join('\n')}\n\n*Datos del Cliente:*\n👤 Nombre: ${name}\n📞 Teléfono: ${phone}\n📍 Ubicación: ${city}, ${dept}\n🏠 Dirección: ${address}\n💳 Pago: ${payment}`;
       
