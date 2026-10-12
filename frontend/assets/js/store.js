@@ -466,7 +466,7 @@
       document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
       document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
-      document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);
+      document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);\n      document.getElementById('cpNewImages')?.addEventListener('change', renderEditedNewImagePreview);
       if (document.getElementById('productsGrid')) loadStorefront();
       const adminLoginView = document.getElementById('adminLoginView');
       const adminDashboardView = document.getElementById('adminDashboardView');
@@ -900,14 +900,22 @@
     }
 
     function renderNewProductImagePreview() {
-      const input = document.getElementById('newProdImages');
-      const container = document.getElementById('newProdImagePreview');
+      renderImageUploadPreview('newProdImages', 'newProdImagePreview', 'new-product-color-name');
+    }
+
+    function renderEditedNewImagePreview() {
+      renderImageUploadPreview('cpNewImages', 'cpNewImagePreview', 'edited-product-color-name');
+    }
+
+    function renderImageUploadPreview(inputId, containerId, inputClass) {
+      const input = document.getElementById(inputId);
+      const container = document.getElementById(containerId);
       if (!input || !container) return;
       const files = Array.from(input.files || []);
       container.innerHTML = '';
       if (!files.length) return;
       if (files.length > 10) {
-        showToast('Puedes subir máximo 10 fotos por producto.', 'fa-triangle-exclamation');
+        showToast('Puedes subir máximo 10 fotos por carga.', 'fa-triangle-exclamation');
         input.value = '';
         return;
       }
@@ -916,15 +924,28 @@
         const card = document.createElement('div');
         card.className = 'new-product-preview-card';
         const img = document.createElement('img');
-        img.loading = 'lazy';
-        img.alt = 'Vista previa de foto ' + (index + 1);
-        img.src = URL.createObjectURL(file);
-        img.onload = () => URL.revokeObjectURL(img.src);
-        const label = document.createElement('span');
-        label.textContent = 'Foto / color ' + (index + 1);
-        card.append(img, label);
+        img.loading = 'lazy'; img.alt = 'Vista previa de foto ' + (index + 1);
+        const objectUrl = URL.createObjectURL(file);
+        img.src = objectUrl;
+        img.onload = () => URL.revokeObjectURL(objectUrl);
+        const label = document.createElement('label');
+        label.textContent = 'Nombre del botón de color';
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text'; nameInput.maxLength = 60; nameInput.required = true;
+        nameInput.className = inputClass;
+        nameInput.value = 'Color ' + (index + 1);
+        nameInput.placeholder = 'Ej. Rojo, Azul, Negro';
+        nameInput.setAttribute('aria-label', 'Nombre del color para foto ' + (index + 1));
+        card.append(img, label, nameInput);
         container.appendChild(card);
       });
+    }
+
+    function readUploadColorNames(containerId, inputClass, files) {
+      const names = Array.from(document.querySelectorAll('#' + containerId + ' .' + inputClass)).map((input, index) =>
+        input.value.trim() || ('Color ' + (index + 1))
+      );
+      return files.map((_, index) => names[index] || ('Color ' + (index + 1)));
     }
 
     async function addNewProduct() {
@@ -934,7 +955,7 @@
       const descripcion = document.getElementById('newProdDescription').value.trim();
       const stock = Number(document.getElementById('newProdStock').value);
       const compatibilidad_moto = document.getElementById('newProdMoto').value.split(',').map(value => value.trim()).filter(Boolean);
-      const files = document.getElementById('newProdImages').files;
+      const files = document.getElementById('newProdImages').files;\n      const colorNames = readUploadColorNames('newProdImagePreview', 'new-product-color-name', Array.from(files));
       if (!nombre || !descripcion || !categoria_id || !Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0) {
         return showToast('Completa nombre, descripción, precio, categoría y stock.', 'fa-triangle-exclamation');
       }
@@ -1006,19 +1027,34 @@
         const count = document.getElementById('cpImageCount');
         if (count) count.textContent = images.length + (images.length === 1 ? ' foto' : ' fotos');
         if (!images.length) {
-          grid.innerHTML = '<p class="editor-empty">Este producto todavía no tiene fotos. Añade imágenes para que los compradores puedan comparar los colores.</p>';
+          grid.innerHTML = '<p class="editor-empty">Este producto todavía no tiene fotos. Añade imágenes y nombra cada botón de color para tus compradores.</p>';
           return;
         }
         grid.innerHTML = images.map((image, index) => {
           const src = mediaUrl(image.url_thumbnail || image.url_medium || image.url);
           const isPrimary = Boolean(image.es_principal);
           return '<article class="editor-image-card"><img loading="lazy" decoding="async" src="' + escapeHtml(src) + '" alt="Foto ' + (index + 1) + '">' +
-            '<div class="editor-image-meta"><span>' + escapeHtml('Foto / color ' + (index + 1)) + '</span>' +
+            '<div class="editor-image-meta"><label>Botón de color<input class="existing-color-name" id="existingColorName' + Number(image.id) + '" maxlength="60" value="' + escapeHtml(image.color_nombre || ('Color ' + (index + 1))) + '"></label>' +
+            '<button type="button" class="editor-image-action" onclick="saveEditedImageColor(' + Number(image.id) + ')">Guardar nombre</button>' +
             (isPrimary ? '<strong class="editor-primary-badge">Principal</strong>' : '<button type="button" class="editor-image-action" onclick="setEditedImagePrimary(' + Number(image.id) + ')">Usar principal</button>') +
-            '<button type="button" class="editor-image-delete" onclick="deleteEditedImage(' + Number(image.id) + ')" aria-label="Eliminar foto ' + (index + 1) + '">Eliminar</button></div></article>';
+            '<button type="button" class="editor-image-delete" onclick="deleteEditedImage(' + Number(image.id) + ')" aria-label="Eliminar foto ' + (index + 1) + '">Eliminar foto</button></div></article>';
         }).join('');
       } catch (error) {
         grid.innerHTML = '<p class="editor-empty editor-error">No se pudieron cargar las fotos: ' + escapeHtml(error.message) + '</p>';
+      }
+    }
+
+    async function saveEditedImageColor(imageId) {
+      const input = document.getElementById('existingColorName' + Number(imageId));
+      if (!input) return;
+      try {
+        await apiRequest('/productos/imagenes/' + Number(imageId) + '/color', {
+          method: 'PUT', body: JSON.stringify({ color_nombre: input.value.trim() })
+        });
+        await renderEditImageManager(activeEditingId);
+        showToast('Nombre del botón de color guardado.');
+      } catch (error) {
+        showToast('No se pudo guardar el nombre: ' + error.message, 'fa-triangle-exclamation');
       }
     }
 
