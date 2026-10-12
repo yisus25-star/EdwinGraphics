@@ -868,3 +868,12 @@ body.page-admin #customPriceModal .product-editor-modal {
     min-height:280px;
   }
 }
+
+
+/* Avoid costly full-panel blur while working in the admin dashboard. */
+body.page-admin #adminModal .modal-card {
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  box-shadow:0 14px 38px rgba(0,0,0,.24);
+}
+body.page-admin #adminModal .admin-prod-item { content-visibility:auto; contain-intrinsic-size:auto 76px; }
