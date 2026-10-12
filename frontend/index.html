@@ -1781,10 +1781,19 @@
       const submitButton = event.submitter || document.querySelector('#checkoutForm button[type="submit"]');
       if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Creando pedido…'; }
       try {
-        const order = await apiRequest('/pedidos', { method: 'POST', body: JSON.stringify(payload) });
-        createdOrderId = order.id;
+        const pendingOrderId = sessionStorage.getItem('edwingraphics_pending_order');
+        let order;
+        if (pendingOrderId) {
+          createdOrderId = Number(pendingOrderId);
+          order = { id: createdOrderId };
+        } else {
+          order = await apiRequest('/pedidos', { method: 'POST', body: JSON.stringify(payload) });
+          createdOrderId = order.id;
+          sessionStorage.setItem('edwingraphics_pending_order', String(order.id));
+        }
         const checkout = await apiRequest('/pedidos/' + order.id + '/checkout', { method: 'POST', body: JSON.stringify({}) });
         if (!checkout.checkoutUrl) throw new Error('El pedido se creó, pero Shopify no devolvió un enlace de pago. Contacta soporte con el pedido #' + order.id + '.');
+        sessionStorage.removeItem('edwingraphics_pending_order');
         cart = [];
         updateCart();
         closeSysModals();
@@ -1796,7 +1805,12 @@
           window.location.href = checkout.checkoutUrl;
         }
       } catch (error) {
-        showToast((createdOrderId ? 'Pedido #' + createdOrderId + ' creado, pero no se pudo abrir el pago: ' : '') + error.message, 'fa-triangle-exclamation');
+        if (createdOrderId && /reserva.*expir|reserva de stock.*expir/i.test(error.message)) {
+          sessionStorage.removeItem('edwingraphics_pending_order');
+          showToast('La reserva del pedido #' + createdOrderId + ' expiró. Vuelve a intentar para crear un pedido nuevo.', 'fa-triangle-exclamation');
+        } else {
+          showToast((createdOrderId ? 'Pedido #' + createdOrderId + ' guardado. Pulsa de nuevo para reintentar el pago sin duplicarlo: ' : '') + error.message, 'fa-triangle-exclamation');
+        }
       } finally {
         if (submitButton) { submitButton.disabled = false; submitButton.innerHTML = '<i class="fa-solid fa-lock"></i> &nbsp;Crear pedido y pagar'; }
       }
@@ -1858,12 +1872,14 @@
       }
       if (!sessionStorage.getItem(TOKEN_KEY)) return showToast('Inicia sesión como administrador.', 'fa-triangle-exclamation');
       if (files.length > 10) return showToast('Puedes subir máximo 10 imágenes por producto.', 'fa-triangle-exclamation');
+      let createdProductId = null;
       const button = document.querySelector('button[onclick="addNewProduct()"]');
       if (button) { button.disabled = true; button.textContent = 'Guardando…'; }
       try {
         const product = await apiRequest('/productos', { method: 'POST', body: JSON.stringify({
           nombre, descripcion, precio, stock, categoria_id, estado: true, compatibilidad_moto, variantes: []
         }) });
+        createdProductId = product.id;
         if (files.length) {
           const formData = new FormData();
           Array.from(files).forEach(file => formData.append('imagenes', file));
@@ -1878,7 +1894,10 @@
         await loadProducts();
         showToast('Producto guardado en la base de datos.');
       } catch (error) {
-        showToast(error.message, 'fa-triangle-exclamation');
+        if (createdProductId) {
+          await loadProducts().catch(() => {});
+          showToast('El producto #' + createdProductId + ' quedó creado, pero ocurrió un error adicional: ' + error.message, 'fa-triangle-exclamation');
+        } else showToast(error.message, 'fa-triangle-exclamation');
       } finally {
         if (button) { button.disabled = false; button.textContent = 'Guardar Producto'; }
       }
