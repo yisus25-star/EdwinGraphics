@@ -1106,6 +1106,8 @@
           <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Categorías del catálogo</h4>
           <span class="field-label">Nombre de la categoría</span>
           <input type="text" id="newCategoryName" placeholder="Ej. Kits gráficos, tanque, guardabarros" maxlength="120" />
+          <label class="field-label" for="newCategoryParent">Categoría principal (opcional)</label>
+          <select id="newCategoryParent"><option value="">Categoría principal / sin padre</option></select>
           <button onclick="addCategory()" class="btn-add-cart" style="width:100%;padding:10px;margin-top:8px;">Crear categoría</button>
           <div class="admin-category-list" id="adminCategoryList"></div>
         </div>
@@ -1488,6 +1490,7 @@
     function renderCategoryControls() {
       const filter = document.getElementById('catalogCategory');
       const adminSelect = document.getElementById('newProdTag');
+      const parentSelect = document.getElementById('newCategoryParent');
       const selected = filter?.value || '';
       if (filter) {
         filter.innerHTML = '<option value="">Todas las categorías</option>' + categories.map(category =>
@@ -1500,6 +1503,11 @@
           '<option value="' + Number(category.id) + '">' + escapeHtml(category.nombre) + '</option>'
         ).join('');
       }
+      if (parentSelect) {
+        parentSelect.innerHTML = '<option value="">Categoría principal / sin padre</option>' + categories.filter(category => !category.parent_id).map(category =>
+          '<option value="' + Number(category.id) + '">' + escapeHtml(category.nombre) + '</option>'
+        ).join('');
+      }
       renderAdminCategories();
     }
 
@@ -1507,10 +1515,26 @@
       const list = document.getElementById('adminCategoryList');
       if (!list) return;
       list.innerHTML = categories.map(category =>
-        '<span class="admin-category-chip">' + escapeHtml(category.nombre) +
+        '<span class="admin-category-chip">' + (category.parent_nombre ? escapeHtml(category.parent_nombre) + ' / ' : '') + escapeHtml(category.nombre) +
+        ' <button type="button" aria-label="Editar categoría ' + escapeHtml(category.nombre) + '" onclick="editCategory(' + Number(category.id) + ')" style="background:none;border:0;color:#fff;cursor:pointer;">✎</button>' +
         ' <button type="button" aria-label="Eliminar categoría ' + escapeHtml(category.nombre) +
         '" onclick="deleteCategory(' + Number(category.id) + ')" style="background:none;border:0;color:var(--red);cursor:pointer;">×</button></span>'
       ).join('');
+    }
+
+    async function editCategory(id) {
+      const category = categories.find(item => Number(item.id) === Number(id));
+      if (!category) return;
+      const nombre = prompt('Nuevo nombre para la categoría:', category.nombre);
+      if (nombre === null || !nombre.trim()) return;
+      try {
+        await apiRequest('/categorias/' + Number(id), { method: 'PUT', body: JSON.stringify({ nombre: nombre.trim() }) });
+        await loadCategories();
+        await loadProducts();
+        showToast('Categoría actualizada.');
+      } catch (error) {
+        showToast(error.message, 'fa-triangle-exclamation');
+      }
     }
 
     async function deleteCategory(id) {
@@ -1529,9 +1553,12 @@
       const input = document.getElementById('newCategoryName');
       const name = input?.value.trim();
       if (!name) return showToast('Escribe el nombre de la categoría', 'fa-triangle-exclamation');
+      const parent_id = document.getElementById('newCategoryParent')?.value || null;
       try {
-        await apiRequest('/categorias', { method: 'POST', body: JSON.stringify({ nombre: name }) });
+        await apiRequest('/categorias', { method: 'POST', body: JSON.stringify({ nombre: name, parent_id: parent_id ? Number(parent_id) : null }) });
         if (input) input.value = '';
+        const parentSelect = document.getElementById('newCategoryParent');
+        if (parentSelect) parentSelect.value = '';
         await loadCategories();
         showToast('Categoría creada');
       } catch (error) {
