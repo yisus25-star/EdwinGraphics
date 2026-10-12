@@ -65,24 +65,13 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* BACKGROUND VIDEO FULLSCREEN FIXED */
-    .bg-fixed {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-      overflow: hidden;
-      background: #000;
-    }
-
-    .bg-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      opacity: 0.95;
-    }
+    /* Fondo estático ligero: se conserva la animación de introducción. */
+    body { background: radial-gradient(ellipse at top, #1b070b 0%, #080808 42%, #000 78%); color:var(--text); font-family:var(--font-sans); overflow-x:hidden; overflow-y:auto; -webkit-font-smoothing:antialiased; }
+    .catalog-toolbar { display:grid; grid-template-columns:minmax(220px,1fr) minmax(180px,260px); gap:12px; margin:0 0 24px; }
+    .catalog-toolbar input, .catalog-toolbar select { width:100%; padding:12px 14px; color:#fff; background:#111; border:1px solid #383838; border-radius:10px; font:inherit; }
+    .about-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center; }
+    .about-panel { padding:24px; border-left:3px solid var(--red); background:#101010; border-radius:0 16px 16px 0; line-height:1.75; color:#d4d4d8; }
+    .no-products { grid-column:1/-1; padding:30px; text-align:center; border:1px dashed #444; border-radius:16px; color:var(--muted); }
 
     /* INTRO SCREEN (2.8 SEGUNDOS CON EL LOGO) */
     .intro-screen {
@@ -773,13 +762,7 @@
     </div>
   </div>
 
-  <!-- BACKGROUND VIDEO FULLSCREEN -->
-  <div class="bg-fixed">
-    <video class="bg-video" autoplay muted loop playsinline>
-      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4" />
-    </video>
-  </div>
-
+  <!-- Fondo estático ligero: conserva la animación de introducción sin reproducir video. -->
   <!-- FIXED NAV HEADER -->
   <div class="header-wrapper">
     <header class="header">
@@ -1016,6 +999,9 @@
 
         <span class="field-label">Dirección de Entrega</span>
         <input type="text" id="cAddress" placeholder="Barrio, Calle / Carrera, Casa o Apto" required />
+
+        <span class="field-label">Observaciones del diseño</span>
+        <textarea id="cObservations" rows="3" maxlength="2000" placeholder="¿Qué color prefieres? ¿Para qué moto y modelo es? Cuéntanos cualquier detalle importante."></textarea>
 
         <span class="field-label">Método de Pago</span>
         <select id="cPayment">
