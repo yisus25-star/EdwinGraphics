@@ -124,7 +124,8 @@ async function subirImagenes(productoId, archivos, nombresColores = []) {
         mimeType: imagen.mimeType,
         ancho: imagen.ancho,
         alto: imagen.alto,
-        tamanoBytes: imagen.tamanoBytes,\n        colorNombre: nombresColores[indice] || `Color / vista ${totalExistente + indice + 1}`,
+        tamanoBytes: imagen.tamanoBytes,
+        colorNombre: nombresColores[indice] || `Color / vista ${totalExistente + indice + 1}`,
       });
       imagenesCreadas.push(creada);
     }
@@ -199,7 +200,8 @@ async function eliminarArchivosImagen(imagen) {
 module.exports = {
   listarPorProducto,
   subirImagenes,
-  actualizarColorNombre,\n  actualizarOrden,
+  actualizarColorNombre,
+  actualizarOrden,
   marcarComoPrincipal,
   eliminar,
 };
