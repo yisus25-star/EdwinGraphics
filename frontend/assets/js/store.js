@@ -458,6 +458,7 @@
       document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
       document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
+      document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);
       if (document.getElementById('productsGrid')) loadStorefront();
       const adminLoginView = document.getElementById('adminLoginView');
       const adminDashboardView = document.getElementById('adminDashboardView');
@@ -781,6 +782,34 @@
       ).join('');
     }
 
+    function renderNewProductImagePreview() {
+      const input = document.getElementById('newProdImages');
+      const container = document.getElementById('newProdImagePreview');
+      if (!input || !container) return;
+      const files = Array.from(input.files || []);
+      container.innerHTML = '';
+      if (!files.length) return;
+      if (files.length > 10) {
+        showToast('Puedes subir máximo 10 fotos por producto.', 'fa-triangle-exclamation');
+        input.value = '';
+        return;
+      }
+      files.forEach((file, index) => {
+        if (!file.type.startsWith('image/')) return;
+        const card = document.createElement('div');
+        card.className = 'new-product-preview-card';
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = 'Vista previa de foto ' + (index + 1);
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        const label = document.createElement('span');
+        label.textContent = 'Foto / color ' + (index + 1);
+        card.append(img, label);
+        container.appendChild(card);
+      });
+    }
+
     async function addNewProduct() {
       const nombre = document.getElementById('newProdName').value.trim();
       const precio = Number(document.getElementById('newProdPrice').value);
@@ -813,6 +842,7 @@
         document.getElementById('newProdStock').value = '10';
         document.getElementById('newProdMoto').value = '';
         document.getElementById('newProdImages').value = '';
+        renderNewProductImagePreview();
         await loadProducts();
         showToast('Producto guardado en la base de datos.');
       } catch (error) {
