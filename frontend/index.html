@@ -1376,6 +1376,8 @@
 
       renderProducts();
       initColombiaSelects();
+      document.getElementById('catalogSearch')?.addEventListener('input', renderProducts);
+      document.getElementById('catalogCategory')?.addEventListener('change', renderProducts);
 
       const sections = document.querySelectorAll("section");
       const navLinks = document.querySelectorAll(".nav-link");
@@ -1446,21 +1448,37 @@
 
     function renderProducts() {
       const grid = document.getElementById('productsGrid');
-      grid.innerHTML = products.map(p => `
+      if (!grid) return;
+      const query = (document.getElementById('catalogSearch')?.value || '').trim().toLocaleLowerCase('es');
+      const category = document.getElementById('catalogCategory')?.value || '';
+      const availableCategories = [...new Set(products.map(p => p.tag).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+      const select = document.getElementById('catalogCategory');
+      if (select) {
+        const selected = select.value;
+        select.innerHTML = '<option value="">Todas las categorías</option>' + availableCategories.map(tag => `<option value="${escapeHtml(tag)}">${escapeHtml(tag)}</option>`).join('');
+        select.value = availableCategories.includes(selected) ? selected : '';
+      }
+      const filtered = products.filter(p => {
+        const compatible = Array.isArray(p.compatibilidadMoto) ? p.compatibilidadMoto.join(' ') : '';
+        const text = [p.name, p.tag, p.descripcion, compatible].join(' ').toLocaleLowerCase('es');
+        return (!query || text.includes(query)) && (!category || p.tag === category);
+      });
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="no-products">No encontramos productos con esos filtros. Prueba con otro nombre o categoría.</div>';
+        return;
+      }
+      grid.innerHTML = filtered.map(p => `
         <div class="catalog-card">
           <div class="product-img-box">
-            ${p.img ? `<img src="${p.img}" alt="${p.name}" />` : 'PRODUCTO A ESPERA DE FOTO'}
+            ${p.img ? `<img loading="lazy" src="${p.img}" alt="${p.name}" />` : 'PRODUCTO A ESPERA DE FOTO'}
             ${p.outOfStock ? `<div class="out-of-stock-badge">Agotado</div>` : ''}
           </div>
           <span class="product-tag">${p.tag}</span>
           <h3 class="product-name">${p.name}</h3>
           <p class="product-price">${formatPriceDisplay(p.price)}</p>
-
           <div class="card-actions">
             <button class="btn-details" onclick="openDetailsModal(${p.id})">Ver detalles</button>
-            <button class="btn-add-cart" ${p.outOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', '${p.price}')">
-              ${p.outOfStock ? 'Agotado' : 'Añadir'}
-            </button>
+            <button class="btn-add-cart" ${p.outOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', '${p.price}')">${p.outOfStock ? 'Agotado' : 'Añadir'}</button>
           </div>
         </div>
       `).join('');
