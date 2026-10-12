@@ -22,7 +22,7 @@ El backend debe escuchar en el puerto configurado (por defecto 3000). No ejecute
 
 ## 3. Abrir la tienda
 
-Abre `frontend/index.html` con Live Server o con un servidor estático. Por defecto el frontend usa `http://localhost:3000` como API. Si el backend está en otra dirección, añade dentro de `<head>`:
+Abre `frontend/index.html` con Live Server para la página de inicio. El catálogo independiente está en `frontend/catalogo.html` y el panel administrativo en `frontend/admin.html`. Abre la carpeta `frontend` como raíz de Live Server para que los tres archivos compartan las rutas `assets/css/store.css` y `assets/js/store.js`. Por defecto el frontend usa `http://localhost:3000` como API. Si el backend está en otra dirección, añade dentro de `<head>`:
 
 ```html
 <meta name="api-base-url" content="https://tu-api.example.com">
@@ -36,7 +36,9 @@ El backend debe permitir CORS desde el origen del frontend.
 - Detalle: abre un producto y revisa su galería si tiene imágenes.
 - Carrito: añade varios productos, aumenta cantidades y quita productos.
 - Pedido: completa nombre, correo, teléfono, departamento, ciudad, dirección y observaciones; crea un pedido con el modo de prueba activo. Debe aparecer el número de pedido y avisar que no hubo cobro.
-- Administración: inicia sesión con un administrador ya creado en la base de datos; comprueba creación de categoría, creación/edición/activación/eliminación de productos, carga de imágenes y listado/cambio de estado de pedidos.
+- Administración: inicia sesión con un administrador ya creado en la base de datos; comprueba creación/edición/activación/eliminación de productos, carga de imágenes, gestión de categorías, listado/cambio de estado de pedidos, tarjetas de resumen y exportación CSV.
+- Navegación: comprueba que Inicio, Catálogo y Admin abran sus páginas separadas.
+- Imagen principal: coloca una imagen autorizada en `frontend/assets/images/hero-moto.jpg`; si no está, la página muestra un fondo de respaldo.
 - Seguridad: verifica que las rutas de administración rechacen peticiones sin token y que la tienda pública siga funcionando sin iniciar sesión.
 - Pago real: desactiva el modo MOCK únicamente después de configurar credenciales de Shopify, dominio, secretos de webhook y suscripciones de webhooks necesarias.
 
