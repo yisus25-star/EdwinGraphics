@@ -23,17 +23,31 @@ function walk(directory) {
 walk(path.join(root, "src"));
 walk(path.join(root, "scripts"));
 
-const htmlPath = path.join(root, "frontend", "index.html");
-const html = fs.readFileSync(htmlPath, "utf8");
-const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
-  .map(match => match[1])
-  .filter(source => source.trim());
-if (!scripts.length) throw new Error("No se encontró JavaScript inline en frontend/index.html");
-scripts.forEach((source, index) => {
-  new vm.Script(source, { filename: "frontend/index.html:inline-script-" + (index + 1) });
-});
-checked.push("frontend/index.html (JavaScript inline)");
+const frontendDir = path.join(root, "frontend");
+const frontendScripts = [];
+function walkFrontend(directory) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === "node_modules") continue;
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) walkFrontend(absolute);
+    else if (entry.isFile() && entry.name.endsWith(".js")) {
+      const source = fs.readFileSync(absolute, "utf8");
+      new vm.Script(source, { filename: path.relative(root, absolute) });
+      frontendScripts.push(path.relative(root, absolute));
+    }
+  }
+}
+walkFrontend(frontendDir);
+if (!frontendScripts.length) throw new Error("No se encontró JavaScript en frontend");
+checked.push(...frontendScripts);
 
+for (const page of ["index.html", "catalogo.html", "admin.html"]) {
+  const pagePath = path.join(frontendDir, page);
+  if (!fs.existsSync(pagePath)) throw new Error("Falta la página frontend/" + page);
+  const html = fs.readFileSync(pagePath, "utf8");
+  if (!html.includes('assets/css/store.css')) throw new Error(page + " no enlaza el CSS compartido");
+  if (!html.includes('assets/js/store.js')) throw new Error(page + " no enlaza el JavaScript compartido");
+}
 const migrationDir = path.join(root, "database", "migrations");
 if (!fs.existsSync(migrationDir)) throw new Error("No existe database/migrations");
 const migrations = fs.readdirSync(migrationDir).filter(name => name.endsWith(".sql"));
