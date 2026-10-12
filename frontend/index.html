@@ -963,9 +963,7 @@
       </div>
       
       <p style="font-size:20px; font-weight:700; color:var(--red); margin-bottom:12px;" id="dPrice">$0</p>
-      <p style="color:var(--muted); font-size:14px; line-height:1.6; margin-bottom:20px;">
-        Personalización de alta resistencia en vinilo especializado. Resistente al agua, al sol y al lavado de alta presión. Acabado brillante con laminado protector.
-      </p>
+      <p id="dDescription" style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px;">Detalles del producto y compatibilidad con tu motocicleta.</p>
       
       <div style="display:flex; flex-direction:column; gap:10px;">
         <button id="dAddBtn" class="btn-add-cart" style="width:100%; padding:14px; font-size:14px;">Añadir al Carrito</button>
@@ -1096,11 +1094,23 @@
           <button onclick="addNewProduct()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:8px;">Guardar Producto</button>
         </div>
 
+        <div class="admin-form-box">
+          <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Categorías del catálogo</h4>
+          <span class="field-label">Nombre de la categoría</span>
+          <input type="text" id="newCategoryName" placeholder="Ej. Kits gráficos, tanque, guardabarros" maxlength="120" />
+          <button onclick="addCategory()" class="btn-add-cart" style="width:100%;padding:10px;margin-top:8px;">Crear categoría</button>
+          <div class="admin-category-list" id="adminCategoryList"></div>
+        </div>
         <div>
-          <h4 style="font-size:14px; margin-bottom:10px;">Inventario Actual</h4>
+          <h4 style="font-size:14px;margin-bottom:10px;">Inventario actual</h4>
           <div id="adminProdList"></div>
         </div>
-      </div>
+        <div class="admin-form-box">
+          <h4 style="font-size:14px;margin-bottom:10px;color:var(--red);">Pedidos recientes</h4>
+          <div id="adminOrderList"></div>
+          <button class="btn-add-cart" onclick="loadOrders()" style="width:100%;padding:10px;margin-top:10px;">Actualizar pedidos</button>
+        </div>
+        <button class="btn-sm btn-sm-del" onclick="logoutAdmin()">Cerrar sesión administrativa</button>     </div>
 
     </div>
   </div>
