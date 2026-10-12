@@ -466,7 +466,8 @@
       document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
       document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
-      document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);\n      document.getElementById('cpNewImages')?.addEventListener('change', renderEditedNewImagePreview);
+      document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);
+      document.getElementById('cpNewImages')?.addEventListener('change', renderEditedNewImagePreview);
       if (document.getElementById('productsGrid')) loadStorefront();
       const adminLoginView = document.getElementById('adminLoginView');
       const adminDashboardView = document.getElementById('adminDashboardView');
@@ -955,7 +956,8 @@
       const descripcion = document.getElementById('newProdDescription').value.trim();
       const stock = Number(document.getElementById('newProdStock').value);
       const compatibilidad_moto = document.getElementById('newProdMoto').value.split(',').map(value => value.trim()).filter(Boolean);
-      const files = document.getElementById('newProdImages').files;\n      const colorNames = readUploadColorNames('newProdImagePreview', 'new-product-color-name', Array.from(files));
+      const files = document.getElementById('newProdImages').files;
+      const colorNames = readUploadColorNames('newProdImagePreview', 'new-product-color-name', Array.from(files));
       if (!nombre || !descripcion || !categoria_id || !Number.isFinite(precio) || precio <= 0 || !Number.isInteger(stock) || stock < 0) {
         return showToast('Completa nombre, descripción, precio, categoría y stock.', 'fa-triangle-exclamation');
       }
@@ -972,6 +974,7 @@
         if (files.length) {
           const formData = new FormData();
           Array.from(files).forEach(file => formData.append('imagenes', file));
+          formData.append('nombres_colores', JSON.stringify(colorNames));
           await apiRequest('/productos/' + product.id + '/imagenes', { method: 'POST', body: formData });
         }
         document.getElementById('newProdName').value = '';
@@ -1062,6 +1065,7 @@
       if (!activeEditingId) return;
       const input = document.getElementById('cpNewImages');
       const files = Array.from(input?.files || []);
+      const colorNames = readUploadColorNames('cpNewImagePreview', 'edited-product-color-name', files);
       if (!files.length) return showToast('Selecciona primero las fotos que quieres subir.', 'fa-triangle-exclamation');
       if (files.length > 10) return showToast('Puedes subir máximo 10 fotos por carga.', 'fa-triangle-exclamation');
       const button = document.getElementById('cpUploadImagesBtn');
@@ -1069,8 +1073,10 @@
       try {
         const formData = new FormData();
         files.forEach(file => formData.append('imagenes', file));
+        formData.append('nombres_colores', JSON.stringify(colorNames));
         await apiRequest('/productos/' + activeEditingId + '/imagenes', { method: 'POST', body: formData });
         input.value = '';
+        renderEditedNewImagePreview();
         await renderEditImageManager(activeEditingId);
         await loadProducts();
         showToast(files.length + (files.length === 1 ? ' foto subida correctamente.' : ' fotos subidas correctamente.'));
@@ -1126,6 +1132,7 @@
           if (pendingFiles.length > 10) throw new Error('Puedes subir máximo 10 fotos por carga.');
           const formData = new FormData();
           pendingFiles.forEach(file => formData.append('imagenes', file));
+          formData.append('nombres_colores', JSON.stringify(readUploadColorNames('cpNewImagePreview', 'edited-product-color-name', pendingFiles)));
           await apiRequest('/productos/' + activeEditingId + '/imagenes', { method: 'POST', body: formData });
         }
         await loadProducts();
