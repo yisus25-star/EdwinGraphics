@@ -474,7 +474,7 @@
       if (sessionStorage.getItem(TOKEN_KEY) && adminLoginView && adminDashboardView) {
         adminLoginView.style.display = 'none';
         adminDashboardView.style.display = 'flex';
-        apiRequest('/pedidos?limit=1').then(() => Promise.all([loadCategories(), loadProducts(), loadOrders()]))
+        Promise.all([loadCategories(), loadProducts(), loadOrders()])
           .catch(() => {
             sessionStorage.removeItem(TOKEN_KEY);
             adminLoginView.style.display = 'block';
@@ -1018,6 +1018,7 @@
       if (imageGrid) imageGrid.innerHTML = '<p class="editor-empty">Cargando fotos del producto…</p>';
       const modal = document.getElementById('customPriceModal');
       if (modal) modal.classList.add('active');
+      document.body.classList.add('modal-open');
       await renderEditImageManager(product.id);
     }
 
@@ -1150,6 +1151,7 @@
       const modal = document.getElementById('customPriceModal');
       if (modal) modal.classList.remove('active');
       activeEditingId = null;
+      if (!document.querySelector('.modal-backdrop.active')) document.body.classList.remove('modal-open');
     }
 
     async function toggleStock(id) {
@@ -1251,9 +1253,11 @@
       closeSysModals();
       const m = document.getElementById(id);
       if (m) m.classList.add('active');
+      document.body.classList.add('modal-open');
     }
 
     function closeSysModals() {
       document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+      if (!document.getElementById('customPriceModal')?.classList.contains('active')) document.body.classList.remove('modal-open');
     }
   
