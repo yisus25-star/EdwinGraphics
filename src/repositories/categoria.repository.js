@@ -17,8 +17,8 @@ async function obtenerPorId(id) {
 
 async function existePorNombre(nombre, excludeId = null) {
   const consulta = excludeId
-    ? "SELECT id FROM categorias WHERE nombre = $1 AND id <> $2"
-    : "SELECT id FROM categorias WHERE nombre = $1";
+    ? "SELECT id FROM categorias WHERE LOWER(nombre) = LOWER($1) AND id <> $2"
+    : "SELECT id FROM categorias WHERE LOWER(nombre) = LOWER($1)";
   const valores = excludeId ? [nombre, excludeId] : [nombre];
 
   const resultado = await pool.query(consulta, valores);
@@ -42,7 +42,7 @@ async function actualizar(id, campos) {
   const permitidas = new Set(["nombre", "descripcion", "parent_id"]);
   const camposValidos = claves.filter((clave) => permitidas.has(clave));
   if (!camposValidos.length) return obtenerPorId(id);
-    const asignaciones = camposValidos.map((clave, indice) => `${clave} = $${indice + 1}`);
+  const asignaciones = camposValidos.map((clave, indice) => `${clave} = $${indice + 1}`);
   const valores = camposValidos.map((clave) => campos[clave]);
 
   const consulta = `
