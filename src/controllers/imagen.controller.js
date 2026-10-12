@@ -13,7 +13,7 @@ async function obtenerPorProducto(req, res) {
 
 async function subir(req, res) {
   try {
-    const imagenes = await imagenService.subirImagenes(req.params.productoId, req.files);
+    const imagenes = await imagenService.subirImagenes(req.params.productoId, req.files, req.body.nombres_colores);
     return sendSuccess(res, {
       statusCode: 201,
       message: "Imágenes subidas correctamente",
