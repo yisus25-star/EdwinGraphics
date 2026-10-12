@@ -28,6 +28,7 @@ const reglasMarcarPrincipal = [
 module.exports = {
   reglasProductoId,
   reglasImagenId,
-  reglasActualizarColorNombre,\n  reglasActualizarOrden,
+  reglasActualizarColorNombre,
+  reglasActualizarOrden,
   reglasMarcarPrincipal,
 };
