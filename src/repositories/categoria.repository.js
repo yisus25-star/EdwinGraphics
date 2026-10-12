@@ -48,7 +48,7 @@ async function actualizar(id, campos) {
   const consulta = `
     UPDATE categorias
     SET ${asignaciones.join(", ")}
-    WHERE id = ${camposValidos.length + 1}
+    WHERE id = $${camposValidos.length + 1}
     RETURNING id, nombre, descripcion, parent_id
   `;
 
