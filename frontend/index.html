@@ -1498,8 +1498,22 @@
       const list = document.getElementById('adminCategoryList');
       if (!list) return;
       list.innerHTML = categories.map(category =>
-        '<span class="admin-category-chip">' + escapeHtml(category.nombre) + '</span>'
+        '<span class="admin-category-chip">' + escapeHtml(category.nombre) +
+        ' <button type="button" aria-label="Eliminar categoría ' + escapeHtml(category.nombre) +
+        '" onclick="deleteCategory(' + Number(category.id) + ')" style="background:none;border:0;color:var(--red);cursor:pointer;">×</button></span>'
       ).join('');
+    }
+
+    async function deleteCategory(id) {
+      const category = categories.find(item => Number(item.id) === Number(id));
+      if (!category || !confirm('¿Eliminar la categoría "' + category.nombre + '"? Solo se puede eliminar si no tiene productos ni subcategorías.')) return;
+      try {
+        await apiRequest('/categorias/' + Number(id), { method: 'DELETE' });
+        await loadCategories();
+        showToast('Categoría eliminada.');
+      } catch (error) {
+        showToast(error.message, 'fa-triangle-exclamation');
+      }
     }
 
     async function addCategory() {
