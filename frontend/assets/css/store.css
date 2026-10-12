@@ -791,3 +791,29 @@ body.page-admin .header-brand { cursor:pointer; }
  .catalog-grid { gap:14px; }
  .admin-form-box { padding:14px!important; }
 }
+
+.hero-visual { position:relative; width:100%; max-width:1120px; height:clamp(220px,38vw,470px); margin:42px auto 30px; overflow:hidden; border-radius:28px; border:1px solid rgba(255,255,255,.13); background:radial-gradient(ellipse at 65% 25%,rgba(242,29,53,.45),transparent 35%),linear-gradient(115deg,#151518 0%,#09090b 48%,#26070d 100%); box-shadow:0 30px 90px rgba(0,0,0,.35); }
+.hero-visual img { width:100%; height:100%; object-fit:cover; display:block; opacity:.92; }
+.hero-visual::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.55),transparent 70%),linear-gradient(0deg,rgba(0,0,0,.5),transparent 60%); pointer-events:none; }
+.hero-image-hint { position:absolute; z-index:1; left:clamp(18px,4vw,44px); bottom:clamp(18px,4vw,38px); max-width:70%; color:white; font-size:clamp(1.15rem,3vw,2rem); font-weight:800; letter-spacing:-.04em; }
+.hero-visual.image-placeholder::before { content:"Agrega tu imagen principal en assets/images/hero-moto.jpg"; position:absolute; z-index:1; left:24px; top:24px; color:#d5d5da; font-size:13px; letter-spacing:.02em; }
+.admin-welcome { display:flex; justify-content:space-between; align-items:center; gap:18px; padding:22px; margin-bottom:18px; border-radius:18px; border:1px solid var(--line); background:radial-gradient(ellipse at right,rgba(242,29,53,.14),transparent 45%),#101014; }
+.admin-welcome h3 { font-size:clamp(1.4rem,3vw,2rem); margin:8px 0; letter-spacing:-.04em; }
+.admin-welcome p { color:#aaaab4; line-height:1.6; max-width:640px; }
+.admin-stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+.admin-stat-card { display:flex; flex-direction:column; gap:7px; padding:18px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(145deg,#18181d,#101013); }
+.admin-stat-card span { color:#b5b5be; font-size:12px; }
+.admin-stat-card strong { font-size:clamp(1.7rem,3vw,2.4rem); letter-spacing:-.05em; }
+.admin-stat-card small { color:#777782; font-size:11px; }
+.admin-action-row { display:flex; gap:10px; }
+.btn-secondary { background:#25252b!important; border:1px solid #41414a!important; }
+body.page-admin #adminModal .modal-card { background:#09090c; }
+body.page-admin .admin-controls { gap:18px; }
+body.page-admin #adminLoginView { max-width:480px; margin:0 auto; }
+@media (max-width:760px) {
+ .hero-visual { height:260px; border-radius:18px; margin:30px auto 24px; }
+ .hero-image-hint { max-width:85%; }
+ .admin-welcome { align-items:flex-start; flex-direction:column; }
+ .admin-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .admin-action-row { flex-direction:column; }
+}
