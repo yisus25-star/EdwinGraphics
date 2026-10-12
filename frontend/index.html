@@ -798,6 +798,7 @@
         <a href="#inicio" class="nav-link active">Inicio</a>
         <a href="#catalogo" class="nav-link">Catálogo</a>
         <a href="#nosotros" class="nav-link">Quiénes somos</a>
+        <a href="#mas-vendidos" class="nav-link">Más vendidos</a>
         <a href="#ubicacion" class="nav-link">Ubicación</a>
         <a href="#redes" class="nav-link">Redes</a>
       </nav>
@@ -869,6 +870,13 @@
         <div class="about-panel"><strong style="color:#fff;">Personalización a tu medida</strong><br />Busca por nombre, categoría o moto compatible. Si necesitas una combinación especial, déjanos las observaciones al realizar tu pedido.</div>
       </div>
     </section>
+    <section class="section-block" id="mas-vendidos" style="display:none;">
+      <div class="section-header-tag">LOS FAVORITOS</div>
+      <h2 class="section-title">Más vendidos</h2>
+      <p class="section-subtitle">Los diseños que más eligen nuestros clientes.</p>
+      <div class="catalog-grid" id="topProductsGrid"></div>
+    </section>
+
     <!-- CATÁLOGO SECTION -->
     <section class="section-block" id="catalogo">
       <div class="section-header-tag">CATÁLOGO</div>
@@ -1468,6 +1476,7 @@
       try {
         await loadCategories();
         await loadProducts();
+        await loadBestSellers();
         renderCategoryControls();
       } catch (error) {
         apiReady = false;
@@ -1579,6 +1588,30 @@
       } else {
         cityInput.disabled = true;
         cityInput.placeholder = 'Selecciona primero un departamento...';
+      }
+    }
+
+    async function loadBestSellers() {
+      const section = document.getElementById('mas-vendidos');
+      const grid = document.getElementById('topProductsGrid');
+      if (!section || !grid) return;
+      try {
+        const data = await apiRequest('/productos/mas-vendidos?limit=4');
+        const rows = Array.isArray(data) ? data : [];
+        const best = rows.map(normalizeProduct);
+        if (!best.length) { section.style.display = 'none'; return; }
+        section.style.display = '';
+        grid.innerHTML = best.map(product =>
+          '<article class="catalog-card"><div class="product-img-box">' +
+          (product.img ? '<img loading="lazy" src="' + escapeHtml(product.img) + '" alt="' + escapeHtml(product.name) + '">' : '<div class="product-placeholder">EDWINGRAPHICS</div>') +
+          '</div><span class="product-tag">MÁS VENDIDO</span><h3 class="product-name">' + escapeHtml(product.name) + '</h3>' +
+          '<p class="product-price">' + formatPriceDisplay(product.price) + '</p>' +
+          '<div class="card-actions"><button class="btn-details" onclick="openDetailsModal(' + product.id + ')">Ver detalles</button>' +
+          '<button class="btn-add-cart" ' + (product.outOfStock ? 'disabled' : '') + ' onclick="addToCartById(' + product.id + ')">Añadir</button></div></article>'
+        ).join('');
+      } catch (error) {
+        section.style.display = 'none';
+        console.warn('No se pudo cargar la sección de más vendidos:', error.message);
       }
     }
 
