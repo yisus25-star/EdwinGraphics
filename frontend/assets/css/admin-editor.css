@@ -56,3 +56,10 @@
  .editor-actions { flex-direction:column-reverse; }
  .editor-actions button { width:100%; }
 }
+
+.new-product-image-preview { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; margin-top:10px; }
+.new-product-image-preview:empty { display:none; }
+.new-product-preview-card { min-width:0; overflow:hidden; border:1px solid #343741; border-radius:9px; background:#111318; }
+.new-product-preview-card img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; }
+.new-product-preview-card span { display:block; padding:6px; color:#c8cbd3; font-size:10px; text-align:center; }
+@media(max-width:700px) { .new-product-image-preview { grid-template-columns:repeat(3,minmax(0,1fr)); } }
