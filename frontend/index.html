@@ -1581,7 +1581,7 @@
       const payment = document.getElementById('cPayment').value;
       const observations = document.getElementById('cObservations')?.value.trim() || '';
 
-      const msg = `Hola Edwin, quiero realizar el siguiente pedido:\n\n${cart.map(i => '- ' + i.name + ' (' + formatPriceDisplay(i.price) + ')').join('\n')}\n\n*Datos del Cliente:*\n👤 Nombre: ${name}\n📞 Teléfono: ${phone}\n📍 Ubicación: ${city}, ${dept}\n🏠 Dirección: ${address}\n💳 Pago: ${payment}`;
+      const msg = `Hola Edwin, quiero realizar el siguiente pedido:\n\n${cart.map(i => '- ' + i.name + ' (' + formatPriceDisplay(i.price) + ')').join('\n')}\n\n*Datos del Cliente:*\n👤 Nombre: ${name}\n📞 Teléfono: ${phone}\n📍 Ubicación: ${city}, ${dept}\n🏠 Dirección: ${address}\n📝 Observaciones: ${observations || 'Sin observaciones'}\n💳 Pago: ${payment}`;
       
       window.open(`https://wa.me/573116945695?text=${encodeURIComponent(msg)}`, '_blank');
       cart = [];
