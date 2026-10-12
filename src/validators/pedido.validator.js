@@ -25,6 +25,9 @@ const reglasCrearPedido = [
     .notEmpty().withMessage("El método de pago es obligatorio")
     .isString().withMessage("El método de pago debe ser un texto"),
 
+  body("observaciones").optional({ nullable: true }).isString().isLength({ max: 2000 })
+    .withMessage("Las observaciones no pueden superar 2000 caracteres"),
+
   body("envio")
     .optional()
     .isFloat({ min: 0 }).withMessage("El costo de envío debe ser un número mayor o igual a cero"),
