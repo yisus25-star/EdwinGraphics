@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdwinGraphics | Personalización Premium de Motos</title>
+    <link rel="icon" type="image/png" href="logo-edwin.png" />
+    <link rel="apple-touch-icon" href="logo-edwin.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdwinGraphics | Personalización Premium de Motos</title>
+    <link rel="icon" type="image/png" href="cabeza-edwin.png" />
+    <link rel="apple-touch-icon" href="cabeza-edwin.png" />
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="assets/css/store.css" />
+  <link rel="stylesheet" href="assets/css/visual-refresh.css" />
+  <link rel="stylesheet" href="assets/css/catalog-page.css" />
+</head>
+<body class="page-catalog">
+
+  <!-- FIXED NAV HEADER -->
+  <div class="header-wrapper">
+    <header class="header">
+      <div class="header-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
+        <div class="brand-pixel-text">Edwin<span>Graphics</span></div>
+        <div class="header-logo-space">
+          <img src="logo-edwin.png" alt="Logo" class="header-logo-img" onerror="this.style.display='none'" />
+        </div>
+      </div>
+
+      <nav class="nav-pill">
+        <a href="index.html#inicio" class="nav-link">Inicio</a>
+        <a href="catalogo.html" class="nav-link active">Catálogo</a>
+<a href="index.html#mas-vendidos" class="nav-link">Más vendidos</a>
+        <a href="index.html#ubicacion" class="nav-link">Ubicación</a>
+        <a href="index.html#redes" class="nav-link">Redes</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="sign-in-btn" onclick="openSysModal('cartModal')">
+          <i class="fa-solid fa-cart-shopping"></i> &nbsp;<span id="cartCount">0</span>
+        </button>
+        <button class="sign-in-btn" onclick="window.location.href='admin.html'">Admin</button>
+      </div>
+    </header>
+  </div>
+
+  <main class="catalog-page-shell">
+    <section class="catalog-intro">
+      <div class="catalog-eyebrow">EDWINGRAPHICS <span>•</span> CATÁLOGO</div>
+      <h1 class="catalog-page-title">Encuentra el estilo de tu moto<span>.</span></h1>
+      <p>Explora nuestros diseños y accesorios. Busca por producto o filtra por categoría y modelo para encontrar el indicado.</p>
+    </section>
+    <section class="catalog-workspace" aria-label="Productos de la tienda">
+      <div class="catalog-controls">
+        <label class="catalog-search-box" for="catalogSearch"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" id="catalogSearch" placeholder="Buscar calcomanías, guardabarros, Yamaha R15..." aria-label="Buscar productos" autocomplete="off" /></label>
+        <div class="catalog-filter"><label for="catalogCategory">Categoría</label><select id="catalogCategory" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option></select></div>
+        <div class="catalog-filter"><label for="catalogMoto">Modelo de moto</label><select id="catalogMoto" aria-label="Filtrar por modelo de moto"><option value="">Todos los modelos</option></select></div>
+        <div class="catalog-filter catalog-sort"><label for="catalogSort">Ordenar por</label><select id="catalogSort" aria-label="Ordenar productos"><option value="featured">Destacados</option><option value="name-asc">Nombre: A-Z</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option></select></div>
+      </div>
+      <div class="catalog-results-bar"><div><h2>Todos los productos</h2><p id="catalogResultCount" aria-live="polite">Cargando productos...</p></div><button type="button" id="clearCatalogFilters" class="catalog-clear-btn">Limpiar filtros <i class="fa-solid fa-rotate-left" aria-hidden="true"></i></button></div>
+      <div class="catalog-grid" id="productsGrid" aria-live="polite"><div class="no-products">Cargando catálogo...</div></div>
+    </section>
+    <footer class="site-footer catalog-footer"><div>© 2026 EdwinGraphics. Todos los derechos reservados.</div><div>Personalización para motos, a tu estilo.</div></footer>
+  </main>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- MODAL: PROMOCIONAL -->
+  <div class="modal-backdrop" id="promoModal">
+    <div class="modal-card" style="text-align:center;">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <div style="font-size:36px; color:var(--red); margin-bottom:10px;"><i class="fa-solid fa-bolt-lightning"></i></div>
+      <h2 style="font-family:var(--font-display); margin-bottom:10px;">¡Diseño Exclusivo!</h2>
+      <p style="color:var(--muted); font-size:14px; line-height:1.5; margin-bottom:18px;">
+        Recibe instalación preferencial y asesoría en diseño 3D gratis agendando hoy tu personalización.
+      </p>
+      <a href="https://wa.me/573116945695?text=Hola%20Edwin!%20Quiero%20aprovechar%20la%20promoci%C3%B3n%20especial%20para%20mi%20moto" target="_blank" class="btn-route-normal" style="width:100%; text-align:center;">
+        <i class="fa-brands fa-whatsapp"></i> &nbsp;Agendar por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLES DE PRODUCTO -->
+  <div class="modal-backdrop" id="detailsModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <span class="product-tag" id="dTag">CATEGORÍA</span>
+      <h2 style="font-family:var(--font-sans); font-size:24px; font-weight:800; margin-bottom:10px;" id="dTitle">Nombre del Producto</h2>
+      
+      <div class="product-img-box" style="height:240px; margin-bottom:16px;" id="dImgContainer">
+        <!-- Render dinámico -->
+      </div>
+      
+      <p style="font-size:20px; font-weight:700; color:var(--red); margin-bottom:12px;" id="dPrice">$0</p>
+      <p id="dDescription" style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px;">Detalles del producto y compatibilidad con tu motocicleta.</p>
+      
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button id="dAddBtn" class="btn-add-cart" style="width:100%; padding:14px; font-size:14px;">Añadir al Carrito</button>
+        <div id="dOnlinePayContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDICIÓN DE PRODUCTO DENTRO DEL ADMIN -->
+  <div class="modal-backdrop" id="customPriceModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;" id="cpTitle">Modificar Producto</h3>
+      
+      <span class="field-label">Nombre del Producto:</span>
+      <input type="text" id="cpNameInput" placeholder="Nombre del producto" />
+
+      <span class="field-label">Descripción / Categoría:</span>
+      <input type="text" id="cpTagInput" placeholder="Categoría" />
+
+      <span class="field-label">Precio (Número o Texto):</span>
+      <input type="text" id="cpInput" placeholder="Ej: 150000 o Consultar" />
+
+      <span class="field-label">Estado:</span>
+      <select id="cpStockSelect">
+        <option value="available">Disponible</option>
+        <option value="outOfStock">Agotado</option>
+      </select>
+
+      <span class="field-label">Imagen del Producto (URL):</span>
+      <input type="text" id="cpImgUrl" placeholder="URLs de fotos separadas por coma (rojo, negro, detalle...)" />
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button onclick="saveCustomPrice()" class="btn-add-cart" style="flex:1;">Guardar cambios</button>
+        <button onclick="closeEditModal()" class="btn-details" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CARRITO Y OPCIONES DE PAGO -->
+  <div class="modal-backdrop" id="cartModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <h2 style="font-family:var(--font-display); margin-bottom:12px;">Tu Carrito</h2>
+      <div id="cartItems" style="max-height:160px; overflow-y:auto; margin-bottom:15px;"></div>
+      <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Total: <span id="cartSubtotal">$0</span></div>
+      
+      <form id="checkoutForm">
+        <span class="field-label">Nombre del Cliente</span>
+        <input type="text" id="cName" placeholder="Tu nombre completo" autocomplete="name" required />
+        <span class="field-label">Correo electrónico</span>
+        <input type="email" id="cEmail" placeholder="correo@ejemplo.com" autocomplete="email" required />
+        
+        <span class="field-label">Teléfono de Contacto</span>
+        <input type="tel" id="cPhone" placeholder="Número de celular" required />
+
+        <span class="field-label">Departamento</span>
+        <select id="cDepartment" onchange="onDeptChange()" required>
+          <option value="">Selecciona tu departamento...</option>
+        </select>
+
+        <span class="field-label">Ciudad / Municipio (Selecciona o escribe si no aparece)</span>
+        <input type="text" id="cCity" list="cityOptions" placeholder="Escribe o busca tu ciudad..." disabled required />
+        <datalist id="cityOptions"></datalist>
+
+        <span class="field-label">Dirección de Entrega</span>
+        <input type="text" id="cAddress" placeholder="Barrio, Calle / Carrera, Casa o Apto" required />
+
+        <span class="field-label">Observaciones del diseño</span>
+        <textarea id="cObservations" rows="3" maxlength="2000" placeholder="¿Qué color prefieres? ¿Para qué moto y modelo es? Cuéntanos cualquier detalle importante."></textarea>
+
+        <span class="field-label">Método de Pago</span>
+        <select id="cPayment">
+          <option value="Nequi">Nequi</option>
+          <option value="PSE">PSE</option>
+          <option value="Tarjeta">Tarjeta Débito/Crédito</option>
+          <option value="Shopify / Online">Pagar Online (Shopify)</option>
+        </select>
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+          <button type="submit" class="btn-add-cart" style="width:100%; padding:12px;"><i class="fa-solid fa-lock"></i> &nbsp;Crear pedido y pagar</button>
+          
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN -->
+  <div class="modal-backdrop" id="adminModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeSysModals()">&times;</button>
+      <h2 style="font-family:var(--font-display); margin-bottom:12px;">Panel Administrativo</h2>
+      
+      <div id="adminLoginView">
+        <span class="field-label">Contraseña de Administrador</span>
+        <input type="email" id="adminEmail" placeholder="Correo del administrador" autocomplete="username" required />
+        <input type="password" id="adminPass" placeholder="Contraseña" autocomplete="current-password" required />
+        <button onclick="loginAdmin()" class="btn-add-cart" style="width:100%; margin-top:6px; padding:12px;">Entrar al Panel</button>
+      </div>
+
+      <div id="adminDashboardView" style="display:none;" class="admin-controls">
+        <div class="admin-welcome">
+          <div><span class="section-header-tag">CENTRO DE CONTROL</span><h3>Resumen de tu tienda</h3><p>Administra el catálogo, revisa pedidos y exporta tus ventas desde un solo lugar.</p></div>
+          <button type="button" class="btn-add-cart" onclick="Promise.all([loadCategories(),loadProducts(),loadOrders()]).then(()=>showToast('Datos actualizados')).catch(e=>showToast(e.message,'fa-triangle-exclamation'))">Actualizar datos</button>
+        </div>
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card"><span>Productos</span><strong id="adminStatProducts">0</strong><small>En catálogo</small></div>
+          <div class="admin-stat-card"><span>Unidades</span><strong id="adminStatStock">0</strong><small>Stock disponible</small></div>
+          <div class="admin-stat-card"><span>Pedidos cargados</span><strong id="adminStatOrders">0</strong><small>Últimos 50 pedidos</small></div>
+          <div class="admin-stat-card"><span>Por gestionar</span><strong id="adminStatPending">0</strong><small>Pedidos no finalizados</small></div>
+        </div>
+        
+        <div class="admin-form-box" style="border-color:var(--red);">
+          <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
+          <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Configura las credenciales y el modo de Shopify en las variables de entorno del servidor. No guardes tokens ni claves en este panel.</p>
+        </div>
+
+        <!-- SECCIÓN: AÑADIR PRODUCTO -->
+        <div class="admin-form-box">
+          <h4 style="font-size:14px; margin-bottom:8px; color:var(--red);">Añadir Nuevo Producto</h4>
+          <span class="field-label">Nombre del Producto</span>
+          <input type="text" id="newProdName" placeholder="Nombre (ej: Tanque R15)" />
+          
+          <span class="field-label">Precio</span>
+          <input type="number" id="newProdPrice" placeholder="Precio en COP (ej: 150000)" min="1" step="1" required />
+          
+          <span class="field-label">Categoría</span>
+          <select id="newProdTag" required><option value="">Cargando categorías...</option></select>
+          
+          <span class="field-label">Descripción del producto</span>
+          <textarea id="newProdDescription" placeholder="Descripción del producto" rows="3" required></textarea>
+          <input type="number" id="newProdStock" placeholder="Unidades disponibles" min="0" value="10" required />
+          <label class="field-label" for="newProdImages">Fotos del producto (máximo 10)</label>
+          <input type="file" id="newProdImages" accept="image/*" multiple />
+          <span class="field-label">Motos compatibles (separadas por coma)</span>
+          <input type="text" id="newProdMoto" placeholder="Yamaha R15, MT-15..." />
+
+          <button type="button" onclick="addNewProduct()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:8px;">Guardar Producto</button>
+        </div>
+
+        <div class="admin-form-box">
+          <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Categorías del catálogo</h4>
+          <span class="field-label">Nombre de la categoría</span>
+          <input type="text" id="newCategoryName" placeholder="Ej. Kits gráficos, tanque, guardabarros" maxlength="120" />
+          <label class="field-label" for="newCategoryParent">Categoría principal (opcional)</label>
+          <select id="newCategoryParent"><option value="">Categoría principal / sin padre</option></select>
+          <button type="button" onclick="addCategory()" class="btn-add-cart" style="width:100%;padding:10px;margin-top:8px;">Crear categoría</button>
+          <div class="admin-category-list" id="adminCategoryList"></div>
+        </div>
+        <div>
+          <h4 style="font-size:14px;margin-bottom:10px;">Inventario actual</h4>
+          <div id="adminProdList"></div>
+        </div>
+        <div class="admin-form-box">
+          <h4 style="font-size:14px;margin-bottom:10px;color:var(--red);">Pedidos recientes</h4>
+          <div id="adminOrderList"></div>
+          <div class="admin-action-row"><button type="button" class="btn-add-cart" onclick="loadOrders()" style="flex:1;padding:10px;margin-top:10px;">Actualizar pedidos</button><button type="button" class="btn-add-cart btn-secondary" onclick="exportOrdersCsv()" style="flex:1;padding:10px;margin-top:10px;">Exportar CSV</button></div>
+        </div>
+        <button class="btn-sm btn-sm-del" onclick="logoutAdmin()">Cerrar sesión administrativa</button>     </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/store.js" defer></script>
+</body>
+</html>

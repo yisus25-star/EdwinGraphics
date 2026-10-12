@@ -61,7 +61,7 @@ function calcularExpiracionReserva() {
 async function crear(datosPedido) {
   await liberarReservasExpiradas();
 
-  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items } = datosPedido;
+  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items, observaciones = null } = datosPedido;
   const pedidoCreado = await withTransaction(async (client) => {
     const clienteRegistrado = await buscarOCrearCliente(cliente, client);
     const direccionRegistrada = await direccionRepository.crear(
@@ -80,6 +80,7 @@ async function crear(datosPedido) {
         total,
         metodoPago,
         reservaExpiraEn: calcularExpiracionReserva(),
+        observaciones,
       },
       client
     );

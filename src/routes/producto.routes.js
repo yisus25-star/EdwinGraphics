@@ -17,6 +17,7 @@ const {
 const {
   reglasProductoId,
   reglasImagenId,
+  reglasActualizarColorNombre,
   reglasActualizarOrden,
   reglasMarcarPrincipal,
 } = require("../validators/imagen.validator");
@@ -27,6 +28,7 @@ const router = express.Router();
 // Productos (públicos)
 // ==========================
 router.get("/", productoController.obtenerTodos);
+router.get("/mas-vendidos", productoController.masVendidos);
 router.get("/slug/:slug", productoController.obtenerPorSlug);
 router.get("/:id", reglasIdProducto, validateRequest, productoController.obtenerPorId);
 
@@ -78,6 +80,15 @@ router.post(
   validateRequest,
   upload.array("imagenes", 10),
   imagenController.subir
+);
+
+router.put(
+  "/imagenes/:id/color",
+  authMiddleware,
+  adminMiddleware,
+  reglasActualizarColorNombre,
+  validateRequest,
+  imagenController.actualizarColorNombre
 );
 
 router.put(
