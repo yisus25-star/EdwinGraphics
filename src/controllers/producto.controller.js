@@ -14,6 +14,15 @@ async function obtenerTodos(req, res) {
   }
 }
 
+async function masVendidos(req, res) {
+  try {
+    const productos = await productoService.masVendidos(req.query);
+    return sendSuccess(res, { message: "Productos más vendidos obtenidos correctamente", data: productos });
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
 async function obtenerPorId(req, res) {
   try {
     const producto = await productoService.obtenerPorId(req.params.id);
@@ -65,6 +74,7 @@ async function eliminar(req, res) {
 
 module.exports = {
   obtenerTodos,
+  masVendidos,
   obtenerPorId,
   obtenerPorSlug,
   crear,
