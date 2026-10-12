@@ -17,7 +17,8 @@ const {
 const {
   reglasProductoId,
   reglasImagenId,
-  reglasActualizarColorNombre,\n  reglasActualizarOrden,
+  reglasActualizarColorNombre,
+  reglasActualizarOrden,
   reglasMarcarPrincipal,
 } = require("../validators/imagen.validator");
 
