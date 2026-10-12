@@ -1422,6 +1422,12 @@
       return Number.isFinite(num) ? '$' + num.toLocaleString('es-CO') : String(priceVal);
     }
 
+    function mediaUrl(url) {
+      if (!url) return '';
+      if (/^https?:\/\//i.test(url)) return url;
+      return API_BASE_URL + (url.startsWith('/') ? url : '/' + url);
+    }
+
     function normalizeProduct(product) {
       const category = categories.find(item => Number(item.id) === Number(product.categoria_id));
       return {
@@ -1431,7 +1437,7 @@
         categoria_id: Number(product.categoria_id),
         price: product.precio,
         stock: Number(product.stock || 0),
-        img: product.imagen_principal || product.imagen_principal_medium || '',
+        img: mediaUrl(product.imagen_principal || product.imagen_principal_medium || ''),
         images: [],
         descripcion: product.descripcion || '',
         compatibilidadMoto: product.compatibilidad_moto || [],
@@ -1604,9 +1610,9 @@
       if (!Array.isArray(images)) images = [];
       if (!images.length && product.img) images = [{ url: product.img, url_medium: product.img }];
       container.innerHTML = images.length
-        ? '<img id="detailMainImage" src="' + escapeHtml(images[0].url_medium || images[0].url) + '" alt="' + escapeHtml(product.name) + '">' +
+        ? '<img id="detailMainImage" src="' + escapeHtml(mediaUrl(images[0].url_medium || images[0].url)) + '" alt="' + escapeHtml(product.name) + '">' +
           '<div class="product-gallery-grid">' + images.map((image, index) =>
-            '<img loading="lazy" src="' + escapeHtml(image.url_thumbnail || image.url) + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src">'
+            '<img loading="lazy" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url)) + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src">'
           ).join('') + '</div>'
         : '<div class="product-placeholder">EDWINGRAPHICS</div>';
       const addButton = document.getElementById('dAddBtn');
