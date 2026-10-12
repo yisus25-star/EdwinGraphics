@@ -226,7 +226,7 @@
       <section class="editor-images-section">
         <div class="editor-section-title"><div><h3>Fotos y colores</h3><p>Selecciona la foto principal y conserva el orden de las variantes de color.</p></div><span id="cpImageCount" class="editor-count">0 fotos</span></div>
         <div id="cpExistingImages" class="editor-image-grid"><p class="editor-empty">Cargando fotos del producto...</p></div>
-        <div class="editor-upload-row"><label class="editor-upload-label" for="cpNewImages"><i class="fa-solid fa-images"></i><span><strong>Añadir fotos</strong><small>JPG, PNG o WebP · hasta 10 por carga</small></span></label><input type="file" id="cpNewImages" accept="image/jpeg,image/png,image/webp" multiple /><button type="button" id="cpUploadImagesBtn" class="btn-details" onclick="uploadEditedProductImages()">Subir fotos</button></div>
+        <div class="editor-upload-row"><label class="editor-upload-label" for="cpNewImages"><i class="fa-solid fa-images"></i><span><strong>Añadir fotos</strong><small>JPG, PNG o WebP · hasta 10 por carga</small></span></label><input type="file" id="cpNewImages" accept="image/*" multiple /><button type="button" id="cpUploadImagesBtn" class="btn-details" onclick="uploadEditedProductImages()">Subir fotos</button></div>
       </section>
       <div class="editor-actions"><button type="button" onclick="closeEditModal()" class="btn-details">Cancelar</button><button type="button" id="cpSaveBtn" onclick="saveCustomPrice()" class="btn-add-cart"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button></div>
     </div>
@@ -327,7 +327,7 @@
           <input type="number" id="newProdStock" placeholder="Unidades disponibles" min="0" value="10" required />
           <label class="field-label" for="newProdImages">Fotos del producto (máximo 10)</label>
           <input type="file" id="newProdImages" accept="image/jpeg,image/png,image/webp" multiple />
-          <div id="newProdImagePreview" class="new-product-image-preview" aria-live="polite"></div>
+          <p class="editor-help">Después de elegir las fotos, escribe el nombre que verá el comprador en cada botón (por ejemplo: Rojo, Azul, Negro).</p>\n          <div id="newProdImagePreview" class="new-product-image-preview" aria-live="polite"></div>
           <span class="field-label">Motos compatibles (separadas por coma)</span>
           <input type="text" id="newProdMoto" placeholder="Yamaha R15, MT-15..." />
 
