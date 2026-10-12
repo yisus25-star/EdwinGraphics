@@ -8,6 +8,12 @@ const reglasImagenId = [
   param("id").isInt({ min: 1 }).withMessage("El id de la imagen no es válido"),
 ];
 
+const reglasActualizarColorNombre = [
+  param("id").isInt({ min: 1 }).withMessage("El id de la imagen no es válido"),
+  body("color_nombre").optional({ nullable: true }).isString().isLength({ max: 60 })
+    .withMessage("El nombre del color debe tener máximo 60 caracteres"),
+];
+
 const reglasActualizarOrden = [
   param("id").isInt({ min: 1 }).withMessage("El id de la imagen no es válido"),
   body("orden")
@@ -22,6 +28,6 @@ const reglasMarcarPrincipal = [
 module.exports = {
   reglasProductoId,
   reglasImagenId,
-  reglasActualizarOrden,
+  reglasActualizarColorNombre,\n  reglasActualizarOrden,
   reglasMarcarPrincipal,
 };
