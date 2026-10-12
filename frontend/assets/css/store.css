@@ -776,7 +776,7 @@ body.page-catalog .intro-screen, body.page-catalog #nosotros, body.page-catalog 
 body.page-catalog .content-container { padding-top:96px; }
 body.page-catalog .section-block#catalogo { min-height:75vh; }
 body.page-catalog .nav-link[href="catalogo.html"] { color:#fff; background:rgba(242,29,53,.18); }
-body.page-admin .intro-screen, body.page-admin .content-container, body.page-admin #promoModal, body.page-admin #detailsModal, body.page-admin #cartModal, body.page-admin #customPriceModal { display:none!important; }
+body.page-admin .intro-screen, body.page-admin .content-container, body.page-admin #promoModal, body.page-admin #detailsModal, body.page-admin #cartModal { display:none!important; }
 body.page-admin #adminModal { display:flex!important; position:relative; inset:auto; z-index:1; min-height:calc(100vh - 95px); padding:32px 18px; background:transparent; overflow:visible; }
 body.page-admin #adminModal .modal-card { width:min(1100px,100%); max-height:none; overflow:visible; margin:auto; }
 body.page-admin .header-wrapper { position:sticky; top:0; }
@@ -816,4 +816,55 @@ body.page-admin #adminLoginView { max-width:480px; margin:0 auto; }
  .admin-welcome { align-items:flex-start; flex-direction:column; }
  .admin-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
  .admin-action-row { flex-direction:column; }
+}
+
+
+/* Keep modal scrolling inside the open dialog, never the page behind it. */
+body.modal-open { overflow:hidden !important; }
+body.modal-open .modal-backdrop.active {
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+}
+body.page-catalog #detailsModal {
+  align-items:flex-start;
+  justify-content:center;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:2vh 2vw;
+}
+body.page-catalog #detailsModal .modal-card {
+  max-height:none;
+  overflow:visible;
+  flex:0 0 auto;
+  margin:auto;
+}
+body.page-catalog #detailsModal .detail-gallery-stage {
+  height:clamp(340px,52vh,620px);
+  min-height:340px;
+}
+body.page-admin #customPriceModal.active {
+  display:flex !important;
+  position:fixed;
+  inset:0;
+  z-index:5000;
+  align-items:flex-start;
+  justify-content:center;
+  overflow-y:auto;
+  padding:2vh 16px;
+  overscroll-behavior:contain;
+}
+body.page-admin #customPriceModal .product-editor-modal {
+  width:min(1000px,calc(100vw - 32px));
+  max-height:none;
+  overflow:visible;
+  margin:auto;
+}
+@media(max-width:800px) {
+  body.page-catalog #detailsModal { padding:8px; }
+  body.page-catalog #detailsModal .detail-gallery-stage {
+    height:clamp(280px,45vh,460px);
+    min-height:280px;
+  }
 }
