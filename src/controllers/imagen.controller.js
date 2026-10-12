@@ -66,7 +66,8 @@ async function eliminar(req, res) {
 module.exports = {
   obtenerPorProducto,
   subir,
-  actualizarColorNombre,\n  actualizarOrden,
+  actualizarColorNombre,
+  actualizarOrden,
   marcarComoPrincipal,
   eliminar,
 };
