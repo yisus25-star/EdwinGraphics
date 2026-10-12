@@ -24,6 +24,15 @@ async function subir(req, res) {
   }
 }
 
+async function actualizarColorNombre(req, res) {
+  try {
+    const imagen = await imagenService.actualizarColorNombre(req.params.id, req.body.color_nombre);
+    return sendSuccess(res, { message: "Nombre de color actualizado correctamente", data: imagen });
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
 async function actualizarOrden(req, res) {
   try {
     const imagen = await imagenService.actualizarOrden(req.params.id, req.body.orden);
@@ -57,7 +66,7 @@ async function eliminar(req, res) {
 module.exports = {
   obtenerPorProducto,
   subir,
-  actualizarOrden,
+  actualizarColorNombre,\n  actualizarOrden,
   marcarComoPrincipal,
   eliminar,
 };
