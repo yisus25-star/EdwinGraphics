@@ -586,8 +586,10 @@
             '<img loading="lazy" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url)) + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src">'
           ).join('') + '</div>'
         : '<div class="product-placeholder">EDWINGRAPHICS</div>';
-      detailQuantity = 1;
+      const compatibility = product.compatibilidadMoto || [];
       const desc = document.getElementById('dDescription');
+      if (desc) desc.textContent = (product.descripcion || '') + (compatibility.length ? '\n\nCompatible con: ' + compatibility.join(', ') : '');
+      detailQuantity = 1;
       if (desc) {
         let quantityControl = document.getElementById('detailQuantityControl');
         if (!quantityControl) {
@@ -605,9 +607,6 @@
       addButton.disabled = product.outOfStock;
       addButton.textContent = product.outOfStock ? 'Agotado' : 'Añadir al carrito';
       addButton.onclick = () => { addToCartById(product.id, detailQuantity); closeSysModals(); };
-      const compatibility = product.compatibilidadMoto || [];
-      const desc = document.getElementById('dDescription');
-      if (desc) desc.textContent = (product.descripcion || '') + (compatibility.length ? '\n\nCompatible con: ' + compatibility.join(', ') : '');
       openSysModal('detailsModal');
     }
 
