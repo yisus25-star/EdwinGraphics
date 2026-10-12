@@ -73,6 +73,11 @@
     .about-panel { padding:24px; border-left:3px solid var(--red); background:#101010; border-radius:0 16px 16px 0; line-height:1.75; color:#d4d4d8; }
     .product-gallery-grid { display:flex; gap:8px; overflow-x:auto; margin-top:8px; }
     .product-gallery-grid img { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid #444; cursor:pointer; }
+    .product-placeholder { min-height:180px; display:grid; place-items:center; background:linear-gradient(135deg,#19090c,#080808); color:#777; letter-spacing:.18em; font-weight:800; }
+    .cart-line { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:13px; margin-bottom:8px; }
+    .cart-line button { border:1px solid #555; background:#171717; color:white; border-radius:6px; margin-left:8px; cursor:pointer; }
+    .admin-category-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .admin-category-chip { border:1px solid #4a4a4a; border-radius:999px; padding:6px 10px; font-size:12px; color:#eee; }
     .no-products { grid-column:1/-1; padding:30px; text-align:center; border:1px dashed #444; border-radius:16px; color:var(--muted); }
 
     /* INTRO SCREEN (2.8 SEGUNDOS CON EL LOGO) */
@@ -750,6 +755,16 @@
       .toast-container { left: 50%; right: auto; transform: translateX(-50%); bottom: 16px; width: 90%; }
       .toast { justify-content: center; text-align: center; }
     }
+  @media (max-width: 700px) {
+      .catalog-toolbar, .about-grid { grid-template-columns:1fr; }
+      .section-block { padding-left:18px; padding-right:18px; }
+      .catalog-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+      .catalog-card { min-width:0; }
+      .product-name { font-size:14px; }
+      .product-price { font-size:16px; }
+      .admin-controls { max-height:72vh; overflow-y:auto; }
+    }
+    @media (max-width: 420px) { .catalog-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -1053,12 +1068,9 @@
 
       <div id="adminDashboardView" style="display:none;" class="admin-controls">
         
-        <!-- SECCIÓN: CONFIGURACIÓN DE PAGO (SHOPIFY) -->
-        <div class="admin-form-box" style="border-color: var(--red);">
-          <h4 style="font-size:14px; margin-bottom:8px; color:var(--red);">Configuración de pago (Shopify Global)</h4>
-          <span class="field-label">LINK DE SHOPIFY (Aplicará para todos los botones de pago online)</span>
-          <input type="text" id="globalShopifyLink" placeholder="https://tu-tienda.myshopify.com/checkout/..." />
-          <button onclick="saveGlobalShopify()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:4px;">Guardar Link de Shopify</button>
+        <div class="admin-form-box" style="border-color:var(--red);">
+          <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
+          <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Configura las credenciales y el modo de Shopify en las variables de entorno del servidor. No guardes tokens ni claves en este panel.</p>
         </div>
 
         <!-- SECCIÓN: AÑADIR PRODUCTO -->
@@ -1497,7 +1509,14 @@
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
       loadStorefront();
       if (sessionStorage.getItem(TOKEN_KEY)) {
-        apiRequest('/auth/login', { method: 'GET' }).catch(() => {});
+        document.getElementById('adminLoginView').style.display = 'none';
+        document.getElementById('adminDashboardView').style.display = 'flex';
+        apiRequest('/pedidos?limit=1').then(() => Promise.all([loadCategories(), loadProducts(), loadOrders()]))
+          .catch(() => {
+            sessionStorage.removeItem(TOKEN_KEY);
+            document.getElementById('adminLoginView').style.display = 'block';
+            document.getElementById('adminDashboardView').style.display = 'none';
+          });
       }
     });
 
