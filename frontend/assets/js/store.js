@@ -321,7 +321,7 @@
         categoria_id: Number(product.categoria_id),
         price: product.precio,
         stock: Number(product.stock || 0),
-        img: mediaUrl(product.imagen_principal || product.imagen_principal_medium || ''),
+        img: mediaUrl(product.imagen_principal_thumbnail || product.imagen_principal || ''),
         images: [],
         descripcion: product.descripcion || '',
         compatibilidadMoto: product.compatibilidad_moto || [],
@@ -458,7 +458,7 @@
       document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
       document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
-      loadStorefront();
+      if (document.getElementById('productsGrid')) loadStorefront();
       const adminLoginView = document.getElementById('adminLoginView');
       const adminDashboardView = document.getElementById('adminDashboardView');
       if (sessionStorage.getItem(TOKEN_KEY) && adminLoginView && adminDashboardView) {
@@ -581,10 +581,10 @@
       if (!Array.isArray(images)) images = [];
       if (!images.length && product.img) images = [{ url: product.img, url_medium: product.img }];
       container.innerHTML = images.length
-        ? '<img id="detailMainImage" src="' + escapeHtml(mediaUrl(images[0].url_medium || images[0].url)) + '" alt="' + escapeHtml(product.name) + '">' +
-          '<div class="product-gallery-grid">' + images.map((image, index) =>
-            '<img loading="lazy" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url)) + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src">'
-          ).join('') + '</div>'
+        ? '<img id="detailMainImage" loading="eager" decoding="async" src="' + escapeHtml(mediaUrl(images[0].url_large || images[0].url_medium || images[0].url)) + '" alt="' + escapeHtml(product.name) + '">' +
+          '<div class="product-color-picker"><span class="product-color-heading">Elige color o vista</span><div class="product-color-options">' + images.map((image, index) =>
+            '<button type="button" class="product-color-option ' + (index === 0 ? 'active' : '') + '" onclick="selectProductImage(this, &quot;' + escapeHtml(mediaUrl(image.url_large || image.url_medium || image.url)) + '&quot;)" aria-pressed="' + (index === 0 ? 'true' : 'false') + '"><img loading="lazy" decoding="async" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url_medium || image.url)) + '" alt=""><span>' + escapeHtml('Color / vista ' + (index + 1)) + '</span></button>'
+          ).join('') + '</div></div>'
         : '<div class="product-placeholder">EDWINGRAPHICS</div>';
       const compatibility = product.compatibilidadMoto || [];
       const desc = document.getElementById('dDescription');
@@ -608,6 +608,16 @@
       addButton.textContent = product.outOfStock ? 'Agotado' : 'Añadir al carrito';
       addButton.onclick = () => { addToCartById(product.id, detailQuantity); closeSysModals(); };
       openSysModal('detailsModal');
+    }
+
+    function selectProductImage(button, imageUrl) {
+      const main = document.getElementById('detailMainImage');
+      if (main) main.src = String(imageUrl).trim();
+      document.querySelectorAll('.product-color-option').forEach(option => {
+        const selected = option === button;
+        option.classList.toggle('active', selected);
+        option.setAttribute('aria-pressed', String(selected));
+      });
     }
 
     function showToast(message, icon = 'fa-circle-check') {
@@ -817,41 +827,139 @@
 
     async function openCustomPriceModal(id) {
       const product = products.find(item => item.id === Number(id));
-      if (!product) return;
-      const name = prompt('Nombre del producto:', product.name);
-      if (name === null) return;
-      const description = prompt('Descripción:', product.descripcion || '');
-      if (description === null) return;
-      const priceInput = prompt('Precio en COP:', String(product.price));
-      if (priceInput === null) return;
-      const stockInput = prompt('Stock disponible:', String(product.stock));
-      if (stockInput === null) return;
-      const categoryInput = prompt('ID de categoría (' + categories.map(item => item.id + ': ' + item.nombre).join(' | ') + '):', String(product.categoria_id));
-      if (categoryInput === null) return;
-      const motoInput = prompt('Motos compatibles separadas por coma:', (product.compatibilidadMoto || []).join(', '));
-      if (motoInput === null) return;
+      if (!product) return showToast('No se encontró el producto.', 'fa-triangle-exclamation');
+      activeEditingId = product.id;
+      document.getElementById('cpTitle').textContent = 'Editar producto #' + product.id;
+      document.getElementById('cpNameInput').value = product.name || '';
+      document.getElementById('cpDescriptionInput').value = product.descripcion || '';
+      document.getElementById('cpPriceInput').value = Number(product.price) || 0;
+      document.getElementById('cpStockInput').value = Number(product.stock) || 0;
+      document.getElementById('cpMotoInput').value = (product.compatibilidadMoto || []).join(', ');
+      document.getElementById('cpEstadoSelect').value = String(product.estado !== false);
+      const categorySelect = document.getElementById('cpCategorySelect');
+      if (categorySelect) {
+        categorySelect.innerHTML = categories.map(category => '<option value="' + Number(category.id) + '">' + escapeHtml(category.nombre) + '</option>').join('');
+        categorySelect.value = String(product.categoria_id);
+      }
+      const files = document.getElementById('cpNewImages');
+      if (files) files.value = '';
+      const imageGrid = document.getElementById('cpExistingImages');
+      if (imageGrid) imageGrid.innerHTML = '<p class="editor-empty">Cargando fotos del producto…</p>';
+      const modal = document.getElementById('customPriceModal');
+      if (modal) modal.classList.add('active');
+      await renderEditImageManager(product.id);
+    }
+
+    async function renderEditImageManager(productId) {
+      const grid = document.getElementById('cpExistingImages');
+      if (!grid) return;
       try {
-        await apiRequest('/productos/' + product.id, { method: 'PUT', body: JSON.stringify({
-          nombre: name.trim(), descripcion: description.trim(), precio: Number(priceInput),
-          stock: Number(stockInput), categoria_id: Number(categoryInput),
-          compatibilidad_moto: motoInput.split(',').map(value => value.trim()).filter(Boolean)
-        }) });
-        await loadProducts();
-        showToast('Producto actualizado.');
+        const data = await apiRequest('/productos/' + Number(productId) + '/imagenes');
+        const images = Array.isArray(data) ? data : (data.imagenes || []);
+        const count = document.getElementById('cpImageCount');
+        if (count) count.textContent = images.length + (images.length === 1 ? ' foto' : ' fotos');
+        if (!images.length) {
+          grid.innerHTML = '<p class="editor-empty">Este producto todavía no tiene fotos. Añade imágenes para que los compradores puedan comparar los colores.</p>';
+          return;
+        }
+        grid.innerHTML = images.map((image, index) => {
+          const src = mediaUrl(image.url_thumbnail || image.url_medium || image.url);
+          const isPrimary = Boolean(image.es_principal);
+          return '<article class="editor-image-card"><img loading="lazy" decoding="async" src="' + escapeHtml(src) + '" alt="Foto ' + (index + 1) + '">' +
+            '<div class="editor-image-meta"><span>' + escapeHtml('Foto / color ' + (index + 1)) + '</span>' +
+            (isPrimary ? '<strong class="editor-primary-badge">Principal</strong>' : '<button type="button" class="editor-image-action" onclick="setEditedImagePrimary(' + Number(image.id) + ')">Usar principal</button>') +
+            '<button type="button" class="editor-image-delete" onclick="deleteEditedImage(' + Number(image.id) + ')" aria-label="Eliminar foto ' + (index + 1) + '">Eliminar</button></div></article>';
+        }).join('');
       } catch (error) {
-        showToast(error.message, 'fa-triangle-exclamation');
+        grid.innerHTML = '<p class="editor-empty editor-error">No se pudieron cargar las fotos: ' + escapeHtml(error.message) + '</p>';
+      }
+    }
+
+    async function uploadEditedProductImages() {
+      if (!activeEditingId) return;
+      const input = document.getElementById('cpNewImages');
+      const files = Array.from(input?.files || []);
+      if (!files.length) return showToast('Selecciona primero las fotos que quieres subir.', 'fa-triangle-exclamation');
+      if (files.length > 10) return showToast('Puedes subir máximo 10 fotos por carga.', 'fa-triangle-exclamation');
+      const button = document.getElementById('cpUploadImagesBtn');
+      if (button) { button.disabled = true; button.textContent = 'Subiendo fotos…'; }
+      try {
+        const formData = new FormData();
+        files.forEach(file => formData.append('imagenes', file));
+        await apiRequest('/productos/' + activeEditingId + '/imagenes', { method: 'POST', body: formData });
+        input.value = '';
+        await renderEditImageManager(activeEditingId);
+        await loadProducts();
+        showToast(files.length + (files.length === 1 ? ' foto subida correctamente.' : ' fotos subidas correctamente.'));
+      } catch (error) {
+        showToast('No se pudieron subir las fotos: ' + error.message, 'fa-triangle-exclamation');
+      } finally {
+        if (button) { button.disabled = false; button.textContent = 'Subir fotos'; }
+      }
+    }
+
+    async function setEditedImagePrimary(imageId) {
+      if (!activeEditingId) return;
+      try {
+        await apiRequest('/productos/imagenes/' + Number(imageId) + '/principal', { method: 'PUT', body: JSON.stringify({}) });
+        await renderEditImageManager(activeEditingId);
+        await loadProducts();
+        showToast('Foto principal actualizada.');
+      } catch (error) {
+        showToast('No se pudo cambiar la foto principal: ' + error.message, 'fa-triangle-exclamation');
+      }
+    }
+
+    async function deleteEditedImage(imageId) {
+      if (!confirm('¿Eliminar esta foto del producto?')) return;
+      try {
+        await apiRequest('/productos/imagenes/' + Number(imageId), { method: 'DELETE' });
+        await renderEditImageManager(activeEditingId);
+        await loadProducts();
+        showToast('Foto eliminada.');
+      } catch (error) {
+        showToast('No se pudo eliminar la foto: ' + error.message, 'fa-triangle-exclamation');
       }
     }
 
     async function saveCustomPrice() {
       if (!activeEditingId) return;
-      await openCustomPriceModal(activeEditingId);
-      closeEditModal();
+      const nombre = document.getElementById('cpNameInput').value.trim();
+      const descripcion = document.getElementById('cpDescriptionInput').value.trim();
+      const precio = Number(document.getElementById('cpPriceInput').value);
+      const stock = Number(document.getElementById('cpStockInput').value);
+      const categoria_id = Number(document.getElementById('cpCategorySelect').value);
+      const compatibilidad_moto = document.getElementById('cpMotoInput').value.split(',').map(value => value.trim()).filter(Boolean);
+      const estado = document.getElementById('cpEstadoSelect').value === 'true';
+      if (!nombre || !descripcion || !categoria_id || !Number.isFinite(precio) || precio < 0 || !Number.isInteger(stock) || stock < 0) {
+        return showToast('Revisa nombre, descripción, precio, categoría y stock.', 'fa-triangle-exclamation');
+      }
+      const button = document.getElementById('cpSaveBtn');
+      if (button) { button.disabled = true; button.textContent = 'Guardando…'; }
+      try {
+        await apiRequest('/productos/' + activeEditingId, { method: 'PUT', body: JSON.stringify({ nombre, descripcion, precio, stock, categoria_id, estado, compatibilidad_moto }) });
+        const pendingFiles = Array.from(document.getElementById('cpNewImages')?.files || []);
+        if (pendingFiles.length) {
+          if (pendingFiles.length > 10) throw new Error('Puedes subir máximo 10 fotos por carga.');
+          const formData = new FormData();
+          pendingFiles.forEach(file => formData.append('imagenes', file));
+          await apiRequest('/productos/' + activeEditingId + '/imagenes', { method: 'POST', body: formData });
+        }
+        await loadProducts();
+        await renderEditImageManager(activeEditingId);
+        showToast('Producto actualizado correctamente.');
+        closeEditModal();
+      } catch (error) {
+        showToast('No se pudieron guardar los cambios: ' + error.message, 'fa-triangle-exclamation');
+      } finally {
+        if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios'; }
+      }
     }
 
     function closeEditModal() {
       const modal = document.getElementById('customPriceModal');
       if (modal) modal.classList.remove('active');
+      activeEditingId = null;
     }
 
     async function toggleStock(id) {
