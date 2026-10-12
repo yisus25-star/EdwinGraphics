@@ -71,6 +71,8 @@
     .catalog-toolbar input, .catalog-toolbar select { width:100%; padding:12px 14px; color:#fff; background:#111; border:1px solid #383838; border-radius:10px; font:inherit; }
     .about-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center; }
     .about-panel { padding:24px; border-left:3px solid var(--red); background:#101010; border-radius:0 16px 16px 0; line-height:1.75; color:#d4d4d8; }
+    .product-gallery-grid { display:flex; gap:8px; overflow-x:auto; margin-top:8px; }
+    .product-gallery-grid img { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid #444; cursor:pointer; }
     .no-products { grid-column:1/-1; padding:30px; text-align:center; border:1px dashed #444; border-radius:16px; color:var(--muted); }
 
     /* INTRO SCREEN (2.8 SEGUNDOS CON EL LOGO) */
@@ -979,7 +981,7 @@
       </select>
 
       <span class="field-label">Imagen del Producto (URL):</span>
-      <input type="text" id="cpImgUrl" placeholder="Pega la URL de la imagen aquí" />
+      <input type="text" id="cpImgUrl" placeholder="URLs de fotos separadas por coma (rojo, negro, detalle...)" />
 
       <div style="display:flex; gap:10px; margin-top:10px;">
         <button onclick="saveCustomPrice()" class="btn-add-cart" style="flex:1;">Guardar cambios</button>
@@ -1070,6 +1072,8 @@
           
           <span class="field-label">Imagen del Producto (URL)</span>
           <input type="text" id="newProdUrl" placeholder="Pega la URL de la imagen aquí" />
+          <span class="field-label">Motos compatibles (separadas por coma)</span>
+          <input type="text" id="newProdMoto" placeholder="Yamaha R15, MT-15..." />
 
           <button onclick="addNewProduct()" class="btn-add-cart" style="width:100%; padding:10px; margin-top:8px;">Guardar Producto</button>
         </div>
@@ -1446,6 +1450,12 @@
       }
     }
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[char]);
+    }
+
     function renderProducts() {
       const grid = document.getElementById('productsGrid');
       if (!grid) return;
@@ -1493,8 +1503,12 @@
       document.getElementById('dPrice').textContent = formatPriceDisplay(p.price);
       
       const imgContainer = document.getElementById('dImgContainer');
-      imgContainer.innerHTML = p.img 
-        ? `<img src="${p.img}" alt="${p.name}" />` 
+      const images = Array.isArray(p.images) && p.images.length ? p.images : (p.img ? [p.img] : []);
+      imgContainer.innerHTML = images.length
+        ? '<img id="detailMainImage" src="' + images[0] + '" alt="' + p.name + '" />' +
+          '<div class="product-gallery-grid">' + images.map((url, index) =>
+            '<img loading="lazy" src="' + url + '" alt="Vista ' + (index + 1) + '" onclick="document.getElementById(\'detailMainImage\').src=this.src" />'
+          ).join('') + '</div>'
         : 'PRODUCTO A ESPERA DE FOTO';
 
       const addBtn = document.getElementById('dAddBtn');
@@ -1657,7 +1671,9 @@
         name,
         tag: tag.toUpperCase(),
         price,
-        img: urlInput.trim(),
+        img: urlInput.split(",").map(url => url.trim()).filter(Boolean)[0] || "",
+        images: urlInput.split(",").map(url => url.trim()).filter(Boolean),
+        compatibilidadMoto: (document.getElementById("newProdMoto")?.value || "").split(",").map(value => value.trim()).filter(Boolean),
         outOfStock: false
       });
 
@@ -1670,6 +1686,7 @@
       document.getElementById('newProdPrice').value = '';
       document.getElementById('newProdTag').value = '';
       document.getElementById('newProdUrl').value = '';
+      if (document.getElementById('newProdMoto')) document.getElementById('newProdMoto').value = '';
     }
 
     function openCustomPriceModal(id) {
@@ -1682,7 +1699,7 @@
       document.getElementById('cpTagInput').value = p.tag;
       document.getElementById('cpInput').value = p.price;
       document.getElementById('cpStockSelect').value = p.outOfStock ? 'outOfStock' : 'available';
-      document.getElementById('cpImgUrl').value = p.img || '';
+      document.getElementById('cpImgUrl').value = (p.images && p.images.length ? p.images : (p.img ? [p.img] : [])).join(', ');
       
       document.getElementById('adminModal').classList.remove('active');
       const editModal = document.getElementById('customPriceModal');
@@ -1710,7 +1727,8 @@
         if (tagVal.trim() !== "") p.tag = tagVal.trim().toUpperCase();
         p.price = val.trim() !== "" ? val : "Consultar precio";
         p.outOfStock = (stockVal === 'outOfStock');
-        p.img = urlVal.trim();
+        p.images = urlVal.split(',').map(url => url.trim()).filter(Boolean);
+        p.img = p.images[0] || '';
 
         saveProductsToStorage();
         renderProducts();
