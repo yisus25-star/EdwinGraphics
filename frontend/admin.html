@@ -83,7 +83,11 @@
         Personalización premium para tu moto. Vinilos de gran formato, diseños exclusivos y acabados profesionales que llevan tu moto a otro nivel.
       </p>
 
-      <a href="#catalogo" class="cta-btn-main">Ver Catálogo</a>
+      <div class="hero-visual">
+        <img src="assets/images/hero-moto.jpg" alt="Personalización gráfica de motocicleta" onerror="this.remove();this.parentElement.classList.add('image-placeholder');" />
+        <span class="hero-image-hint">Personalización que se nota</span>
+      </div>
+      <a href="catalogo.html" class="cta-btn-main">Ver Catálogo</a>
 
       <div class="stats-footer">
         <div class="stat-item">
@@ -331,6 +335,16 @@
       </div>
 
       <div id="adminDashboardView" style="display:none;" class="admin-controls">
+        <div class="admin-welcome">
+          <div><span class="section-header-tag">CENTRO DE CONTROL</span><h3>Resumen de tu tienda</h3><p>Administra el catálogo, revisa pedidos y exporta tus ventas desde un solo lugar.</p></div>
+          <button type="button" class="btn-add-cart" onclick="Promise.all([loadCategories(),loadProducts(),loadOrders()]).then(()=>showToast('Datos actualizados')).catch(e=>showToast(e.message,'fa-triangle-exclamation'))">Actualizar datos</button>
+        </div>
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card"><span>Productos</span><strong id="adminStatProducts">0</strong><small>En catálogo</small></div>
+          <div class="admin-stat-card"><span>Unidades</span><strong id="adminStatStock">0</strong><small>Stock disponible</small></div>
+          <div class="admin-stat-card"><span>Pedidos cargados</span><strong id="adminStatOrders">0</strong><small>Últimos 50 pedidos</small></div>
+          <div class="admin-stat-card"><span>Por gestionar</span><strong id="adminStatPending">0</strong><small>Pedidos no finalizados</small></div>
+        </div>
         
         <div class="admin-form-box" style="border-color:var(--red);">
           <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
@@ -376,7 +390,7 @@
         <div class="admin-form-box">
           <h4 style="font-size:14px;margin-bottom:10px;color:var(--red);">Pedidos recientes</h4>
           <div id="adminOrderList"></div>
-          <button class="btn-add-cart" onclick="loadOrders()" style="width:100%;padding:10px;margin-top:10px;">Actualizar pedidos</button>
+          <div class="admin-action-row"><button type="button" class="btn-add-cart" onclick="loadOrders()" style="flex:1;padding:10px;margin-top:10px;">Actualizar pedidos</button><button type="button" class="btn-add-cart btn-secondary" onclick="exportOrdersCsv()" style="flex:1;padding:10px;margin-top:10px;">Exportar CSV</button></div>
         </div>
         <button class="btn-sm btn-sm-del" onclick="logoutAdmin()">Cerrar sesión administrativa</button>     </div>
 
