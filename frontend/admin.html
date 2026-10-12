@@ -49,7 +49,7 @@
         <button class="sign-in-btn" onclick="openSysModal('cartModal')">
           <i class="fa-solid fa-cart-shopping"></i> &nbsp;<span id="cartCount">0</span>
         </button>
-        <button class="sign-in-btn" onclick="window.location.href='admin.html'">Admin</button>
+        <button class="sign-in-btn" onclick="openSysModal('adminModal')"><i class="fa-solid fa-user-shield"></i> Admin</button>
       </div>
     </header>
   </div>
@@ -116,24 +116,7 @@
         <div class="about-panel"><strong style="color:#fff;">Personalización a tu medida</strong><br />Busca por nombre, categoría o moto compatible. Si necesitas una combinación especial, déjanos las observaciones al realizar tu pedido.</div>
       </div>
     </section>
-    <section class="section-block" id="mas-vendidos" style="display:none;">
-      <div class="section-header-tag">LOS FAVORITOS</div>
-      <h2 class="section-title">Más vendidos</h2>
-      <p class="section-subtitle">Los diseños que más eligen nuestros clientes.</p>
-      <div class="catalog-grid" id="topProductsGrid"></div>
-    </section>
-
-    <!-- CATÁLOGO SECTION -->
-    <section class="section-block" id="catalogo">
-      <div class="section-header-tag">CATÁLOGO</div>
-      <h2 class="section-title">Productos</h2>
-      <p class="section-subtitle">Busca por diseño, categoría o modelo de moto y filtra para encontrar lo que necesitas.</p>
-      <div class="catalog-toolbar">
-        <input type="search" id="catalogSearch" placeholder="Buscar: Yamaha R15, tanque, guardabarros..." aria-label="Buscar productos" />
-        <select id="catalogCategory" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option></select>
-      </div>
-      <div class="catalog-grid" id="productsGrid"></div>
-    </section>
+    <!-- Gestión de productos desde el panel administrativo -->
 
     <!-- UBICACIÓN SECTION -->
     <section class="section-block" id="ubicacion">
@@ -343,7 +326,8 @@
           <textarea id="newProdDescription" placeholder="Descripción del producto" rows="3" required></textarea>
           <input type="number" id="newProdStock" placeholder="Unidades disponibles" min="0" value="10" required />
           <label class="field-label" for="newProdImages">Fotos del producto (máximo 10)</label>
-          <input type="file" id="newProdImages" accept="image/*" multiple />
+          <input type="file" id="newProdImages" accept="image/jpeg,image/png,image/webp" multiple />
+          <div id="newProdImagePreview" class="new-product-image-preview" aria-live="polite"></div>
           <span class="field-label">Motos compatibles (separadas por coma)</span>
           <input type="text" id="newProdMoto" placeholder="Yamaha R15, MT-15..." />
 
