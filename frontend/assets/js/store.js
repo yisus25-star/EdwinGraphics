@@ -343,6 +343,7 @@
       apiReady = true;
       renderProducts();
       renderAdminList();
+      renderAdminStats();
     }
 
     async function loadStorefront() {
@@ -847,6 +848,7 @@
       try {
         const data = await apiRequest('/pedidos?limit=50');
         orders = data.pedidos || [];
+        renderAdminStats();
         container.innerHTML = orders.length ? orders.map(order =>
           '<div class="admin-prod-item"><div><strong>Pedido #' + order.id + '</strong> — ' + formatPriceDisplay(order.total) +
           '<div style="font-size:12px;color:#aaa">Estado: ' + escapeHtml(order.estado) + ' · Pago: ' + escapeHtml(order.payment_status) + '</div></div>' +
@@ -857,6 +859,41 @@
       } catch (error) {
         container.innerHTML = '<p>' + escapeHtml(error.message) + '</p>';
       }
+    }
+
+
+    function renderAdminStats() {
+      const productsStat = document.getElementById('adminStatProducts');
+      const stockStat = document.getElementById('adminStatStock');
+      const ordersStat = document.getElementById('adminStatOrders');
+      const pendingStat = document.getElementById('adminStatPending');
+      if (productsStat) productsStat.textContent = products.length;
+      if (stockStat) stockStat.textContent = products.reduce((total, product) => total + Math.max(0, Number(product.stock) || 0), 0);
+      if (ordersStat) ordersStat.textContent = orders.length;
+      if (pendingStat) pendingStat.textContent = orders.filter(order => !['Pagado', 'Entregado', 'Cancelado'].includes(order.estado)).length;
+    }
+
+    function exportOrdersCsv() {
+      if (!orders.length) return showToast('No hay pedidos cargados para exportar.', 'fa-triangle-exclamation');
+      const columns = [
+        ['Pedido', 'id'], ['Fecha', 'created_at'], ['Cliente', 'nombre_cliente'],
+        ['Correo', 'correo_cliente'], ['Teléfono', 'telefono_cliente'],
+        ['Estado', 'estado'], ['Pago', 'payment_status'], ['Total COP', 'total']
+      ];
+      const cell = value => '"' + String(value ?? '').replace(/"/g, '""') + '"';
+      const csv = '\uFEFF' + [columns.map(column => cell(column[0])).join(';'),
+        ...orders.map(order => columns.map(column => cell(order[column[1]])).join(';'))
+      ].join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'edwingraphics-pedidos-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast('Exportación de pedidos iniciada.');
     }
 
     async function updateOrderStatus(id, estado) {
