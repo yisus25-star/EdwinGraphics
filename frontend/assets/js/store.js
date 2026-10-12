@@ -277,6 +277,14 @@
     let activeEditingId = null;
     let apiReady = false;
     let detailQuantity = 1;
+    let detailImages = [];
+    let detailImageIndex = 0;
+    let zoomScale = 1;
+    let zoomPanX = 0;
+    let zoomPanY = 0;
+    let zoomDragging = false;
+    let zoomDragX = 0;
+    let zoomDragY = 0;
 
     async function apiRequest(path, options = {}) {
       const headers = new Headers(options.headers || {});
@@ -576,17 +584,17 @@
       let images = [];
       try {
         images = await apiRequest('/productos/' + product.id + '/imagenes');
-      } catch (_) {
-        images = [];
-      }
+      } catch (_) { images = []; }
       if (!Array.isArray(images)) images = [];
-      if (!images.length && product.img) images = [{ url: product.img, url_medium: product.img }];
-      container.innerHTML = images.length
-        ? '<img id="detailMainImage" loading="eager" decoding="async" src="' + escapeHtml(mediaUrl(images[0].url_large || images[0].url_medium || images[0].url)) + '" alt="' + escapeHtml(product.name) + '">' +
-          '<div class="product-color-picker"><span class="product-color-heading">Elige color o vista</span><div class="product-color-options">' + images.map((image, index) =>
-            '<button type="button" class="product-color-option ' + (index === 0 ? 'active' : '') + '" onclick="selectProductImage(this, &quot;' + escapeHtml(mediaUrl(image.url_large || image.url_medium || image.url)) + '&quot;)" aria-pressed="' + (index === 0 ? 'true' : 'false') + '"><img loading="lazy" decoding="async" src="' + escapeHtml(mediaUrl(image.url_thumbnail || image.url_medium || image.url)) + '" alt=""><span>' + escapeHtml('Color / vista ' + (index + 1)) + '</span></button>'
-          ).join('') + '</div></div>'
-        : '<div class="product-placeholder">EDWINGRAPHICS</div>';
+      if (!images.length && product.img) images = [{ url: product.img, url_medium: product.img, url_large: product.img, color_nombre: 'Vista principal' }];
+      detailImages = images.map((image, index) => ({
+        ...image,
+        full: mediaUrl(image.url_large || image.url_medium || image.url),
+        thumb: mediaUrl(image.url_thumbnail || image.url_medium || image.url),
+        label: String(image.color_nombre || ('Color / vista ' + (index + 1)))
+      }));
+      detailImageIndex = Math.max(0, detailImages.findIndex(image => image.es_principal));
+      renderDetailGallery(product);
       const compatibility = product.compatibilidadMoto || [];
       const desc = document.getElementById('dDescription');
       if (desc) desc.textContent = (product.descripcion || '') + (compatibility.length ? '\n\nCompatible con: ' + compatibility.join(', ') : '');
@@ -611,15 +619,124 @@
       openSysModal('detailsModal');
     }
 
-    function selectProductImage(button, imageUrl) {
+    function renderDetailGallery(product) {
+      const container = document.getElementById('dImgContainer');
+      if (!container) return;
+      if (!detailImages.length) {
+        container.innerHTML = '<div class="product-placeholder">EDWINGRAPHICS</div>';
+        return;
+      }
+      const active = detailImages[detailImageIndex] || detailImages[0];
+      container.innerHTML =
+        '<div class="detail-gallery-stage">' +
+          '<button type="button" class="detail-gallery-arrow detail-gallery-prev" onclick="stepDetailImage(-1)" aria-label="Foto anterior" ' + (detailImages.length < 2 ? 'disabled' : '') + '>‹</button>' +
+          '<img id="detailMainImage" loading="eager" decoding="async" src="' + escapeHtml(active.full) + '" alt="' + escapeHtml(product.name + ' — ' + active.label) + '" onclick="openImageZoom()" title="Haz clic para ampliar">' +
+          '<button type="button" class="detail-gallery-arrow detail-gallery-next" onclick="stepDetailImage(1)" aria-label="Foto siguiente" ' + (detailImages.length < 2 ? 'disabled' : '') + '>›</button>' +
+          '<button type="button" class="detail-zoom-trigger" onclick="openImageZoom()"><i class="fa-solid fa-magnifying-glass-plus"></i> Ampliar</button>' +
+        '</div>' +
+        '<div class="detail-image-caption"><strong id="detailImageLabel">' + escapeHtml(active.label) + '</strong><span>' + (detailImageIndex + 1) + ' / ' + detailImages.length + '</span></div>' +
+        '<div class="detail-color-picker"><p>Elige el color o diseño</p><div class="detail-color-buttons">' +
+          detailImages.map((image, index) => '<button type="button" class="detail-color-button ' + (index === detailImageIndex ? 'active' : '') + '" onclick="selectProductImage(this,' + index + ')" aria-pressed="' + (index === detailImageIndex ? 'true' : 'false') + '"><img loading="lazy" decoding="async" src="' + escapeHtml(image.thumb) + '" alt=""><span>' + escapeHtml(image.label) + '</span></button>').join('') +
+        '</div></div>';
+    }
+
+    function selectProductImage(button, index) {
+      const parsed = Number(index);
+      if (!Number.isInteger(parsed) || parsed < 0 || parsed >= detailImages.length) return;
+      detailImageIndex = parsed;
+      const active = detailImages[parsed];
       const main = document.getElementById('detailMainImage');
-      if (main) main.src = String(imageUrl).trim();
-      document.querySelectorAll('.product-color-option').forEach(option => {
-        const selected = option === button;
+      if (main) { main.src = active.full; main.alt = active.label; }
+      const label = document.getElementById('detailImageLabel');
+      if (label) label.textContent = active.label;
+      const counter = document.querySelector('.detail-image-caption span');
+      if (counter) counter.textContent = (parsed + 1) + ' / ' + detailImages.length;
+      document.querySelectorAll('.detail-color-button').forEach((option, i) => {
+        const selected = i === parsed;
         option.classList.toggle('active', selected);
         option.setAttribute('aria-pressed', String(selected));
       });
+      document.querySelectorAll('.detail-gallery-arrow').forEach(arrow => arrow.disabled = detailImages.length < 2);
     }
+
+    function stepDetailImage(direction) {
+      if (!detailImages.length) return;
+      const next = (detailImageIndex + direction + detailImages.length) % detailImages.length;
+      selectProductImage(null, next);
+    }
+
+    function openImageZoom() {
+      if (!detailImages.length) return;
+      let overlay = document.getElementById('imageZoomOverlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'imageZoomOverlay';
+        overlay.className = 'image-zoom-overlay';
+        overlay.innerHTML = '<button type="button" class="zoom-close" aria-label="Cerrar zoom">×</button><button type="button" class="zoom-nav zoom-prev" aria-label="Foto anterior">‹</button><div class="zoom-canvas"><img id="zoomImage" alt="Imagen ampliada"></div><button type="button" class="zoom-nav zoom-next" aria-label="Foto siguiente">›</button><div class="zoom-toolbar"><button type="button" data-zoom="out" aria-label="Alejar">−</button><button type="button" data-zoom="reset">100%</button><button type="button" data-zoom="in" aria-label="Acercar">+</button><span class="zoom-hint">Usa la rueda del ratón o los botones para ampliar</span></div>';
+        document.body.appendChild(overlay);
+        overlay.querySelector('.zoom-close').addEventListener('click', closeImageZoom);
+        overlay.querySelector('.zoom-prev').addEventListener('click', () => { stepDetailImage(-1); syncZoomImage(); });
+        overlay.querySelector('.zoom-next').addEventListener('click', () => { stepDetailImage(1); syncZoomImage(); });
+        overlay.querySelector('[data-zoom="out"]').addEventListener('click', () => setZoomScale(zoomScale - 0.25));
+        overlay.querySelector('[data-zoom="in"]').addEventListener('click', () => setZoomScale(zoomScale + 0.25));
+        overlay.querySelector('[data-zoom="reset"]').addEventListener('click', () => setZoomScale(1));
+        overlay.addEventListener('click', event => { if (event.target === overlay) closeImageZoom(); });
+        const canvas = overlay.querySelector('.zoom-canvas');
+        canvas.addEventListener('wheel', event => { event.preventDefault(); setZoomScale(zoomScale + (event.deltaY < 0 ? 0.15 : -0.15)); }, { passive: false });
+        const zoomImg = overlay.querySelector('#zoomImage');
+        zoomImg.addEventListener('pointerdown', event => {
+          if (zoomScale <= 1) return;
+          zoomDragging = true; zoomDragX = event.clientX - zoomPanX; zoomDragY = event.clientY - zoomPanY;
+          zoomImg.classList.add('dragging'); zoomImg.setPointerCapture(event.pointerId);
+        });
+        zoomImg.addEventListener('pointermove', event => {
+          if (!zoomDragging) return;
+          zoomPanX = event.clientX - zoomDragX; zoomPanY = event.clientY - zoomDragY; applyZoomTransform();
+        });
+        const stopDrag = () => { zoomDragging = false; zoomImg.classList.remove('dragging'); };
+        zoomImg.addEventListener('pointerup', stopDrag); zoomImg.addEventListener('pointercancel', stopDrag);
+      }
+      overlay.classList.add('active');
+      document.body.classList.add('zoom-open');
+      syncZoomImage();
+      setZoomScale(1);
+    }
+
+    function syncZoomImage() {
+      const img = document.getElementById('zoomImage');
+      const overlay = document.getElementById('imageZoomOverlay');
+      if (!img || !overlay) return;
+      img.src = detailImages[detailImageIndex]?.full || '';
+      img.alt = detailImages[detailImageIndex]?.label || 'Imagen ampliada';
+      overlay.querySelector('.zoom-prev').disabled = detailImages.length < 2;
+      overlay.querySelector('.zoom-next').disabled = detailImages.length < 2;
+    }
+
+    function setZoomScale(value) {
+      zoomScale = Math.max(1, Math.min(4, Number(value) || 1));
+      if (zoomScale === 1) { zoomPanX = 0; zoomPanY = 0; }
+      const reset = document.querySelector('#imageZoomOverlay [data-zoom="reset"]');
+      if (reset) reset.textContent = Math.round(zoomScale * 100) + '%';
+      applyZoomTransform();
+    }
+
+    function applyZoomTransform() {
+      const img = document.getElementById('zoomImage');
+      if (img) img.style.transform = 'translate(' + zoomPanX + 'px,' + zoomPanY + 'px) scale(' + zoomScale + ')';
+    }
+
+    function closeImageZoom() {
+      const overlay = document.getElementById('imageZoomOverlay');
+      if (overlay) overlay.classList.remove('active');
+      document.body.classList.remove('zoom-open');
+    }
+
+    document.addEventListener('keydown', event => {
+      if (!document.getElementById('imageZoomOverlay')?.classList.contains('active')) return;
+      if (event.key === 'Escape') closeImageZoom();
+      if (event.key === 'ArrowLeft') { stepDetailImage(-1); syncZoomImage(); }
+      if (event.key === 'ArrowRight') { stepDetailImage(1); syncZoomImage(); }
+    });
 
     function showToast(message, icon = 'fa-circle-check') {
       const container = document.getElementById('toastContainer');
