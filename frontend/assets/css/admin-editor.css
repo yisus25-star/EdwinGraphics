@@ -63,3 +63,18 @@
 .new-product-preview-card img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; }
 .new-product-preview-card span { display:block; padding:6px; color:#c8cbd3; font-size:10px; text-align:center; }
 @media(max-width:700px) { .new-product-image-preview { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+
+
+/* Editable names for every customer-facing color option */
+.editor-help { display:block; color:#a9aeba; font-size:12px; line-height:1.5; margin:2px 0 8px; }
+.new-product-image-preview { grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:12px; }
+.new-product-preview-card { padding:8px; }
+.new-product-preview-card img { border-radius:7px; background:#fff; }
+.new-product-preview-card label, .editor-image-meta label { display:block; padding:8px 0 5px; color:#c9ccd4; font-size:11px; font-weight:750; text-align:left; }
+.new-product-preview-card input, .existing-color-name { display:block; width:100%; min-width:0; border:1px solid #3b3f49; border-radius:8px; background:#090a0d; color:#fff; padding:9px 10px; font:inherit; font-size:12px; outline:none; }
+.new-product-preview-card input:focus, .existing-color-name:focus { border-color:#f1263d; box-shadow:0 0 0 2px #f1263d22; }
+.editor-image-card { min-width:0; }
+.editor-image-meta { display:flex; flex-direction:column; align-items:stretch; gap:7px; padding:8px; }
+.editor-image-meta label { padding:0; }
+.editor-image-meta button { width:100%; }
+@media(max-width:700px) { .new-product-image-preview { grid-template-columns:repeat(2,minmax(0,1fr)); } }
