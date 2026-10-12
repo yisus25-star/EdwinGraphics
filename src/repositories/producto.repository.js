@@ -129,7 +129,7 @@ async function actualizar(id, campos) {
   const claves = Object.keys(campos).filter((clave) => permitidas.has(clave));
   if (claves.length === 0) return obtenerPorId(id);
 
-  const asignaciones = claves.map((clave, indice) => clave === "variantes" ? `${clave} = ${indice + 1}::jsonb` : `${clave} = ${indice + 1}`);
+  const asignaciones = claves.map((clave, indice) => clave === "variantes" ? `${clave} = $${indice + 1}::jsonb` : `${clave} = $${indice + 1}`);
   const valores = claves.map((clave) => clave === "variantes" ? JSON.stringify(campos[clave]) : campos[clave]);
 
   const consulta = `
