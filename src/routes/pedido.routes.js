@@ -32,6 +32,7 @@ router.post(
 
 // Listado y gestión: solo administrador.
 router.get("/", authMiddleware, adminMiddleware, pedidoController.obtenerTodos);
+router.get("/balance", authMiddleware, adminMiddleware, pedidoController.obtenerBalance);
 
 router.put(
   "/:id",
