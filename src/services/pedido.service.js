@@ -10,6 +10,8 @@ const withTransaction = require("../utils/withTransaction");
 const { getPagination, buildPaginationMeta } = require("../utils/pagination");
 const { ESTADOS_VALIDOS } = require("../validators/pedido.validator");
 const envConfig = require("../config/env");
+const wompiService = require("./wompi.service");
+const pool = require("../config/db");
 
 const ESTADOS_NO_CANCELABLES = ["Entregado", "Cancelado"];
 
@@ -192,6 +194,16 @@ async function crearCheckout(id) {
     throw ApiError.conflict("La reserva de stock de este pedido ya expiró. Crea un nuevo pedido para continuar.");
   }
 
+  if (envConfig.payments.provider === "wompi") {
+    const checkout = wompiService.crearCheckout(pedido);
+    if (!pedido.wompi_reference) await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
+    await pool.query(
+      "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
+      [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
+    );
+    return { checkoutUrl: checkout.checkoutUrl, referencia: checkout.reference, proveedor: "wompi" };
+  }
+
   if (pedido.shopify_checkout_url) {
     return {
       checkoutUrl: pedido.shopify_checkout_url,
@@ -325,5 +337,6 @@ module.exports = {
   cancelar,
   crearCheckout,
   procesarWebhookShopify,
+  procesarWebhookWompi: wompiService.procesarEvento,
   liberarReservasExpiradas,
 };
