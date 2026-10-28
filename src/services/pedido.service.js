@@ -10,6 +10,8 @@ const withTransaction = require("../utils/withTransaction");
 const { getPagination, buildPaginationMeta } = require("../utils/pagination");
 const { ESTADOS_VALIDOS } = require("../validators/pedido.validator");
 const envConfig = require("../config/env");
+const wompiService = require("./wompi.service");
+const pool = require("../config/db");
 
 const ESTADOS_NO_CANCELABLES = ["Entregado", "Cancelado"];
 
@@ -61,7 +63,7 @@ function calcularExpiracionReserva() {
 async function crear(datosPedido) {
   await liberarReservasExpiradas();
 
-  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items } = datosPedido;
+  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items, observaciones = null } = datosPedido;
   const pedidoCreado = await withTransaction(async (client) => {
     const clienteRegistrado = await buscarOCrearCliente(cliente, client);
     const direccionRegistrada = await direccionRepository.crear(
@@ -80,6 +82,7 @@ async function crear(datosPedido) {
         total,
         metodoPago,
         reservaExpiraEn: calcularExpiracionReserva(),
+        observaciones,
       },
       client
     );
@@ -177,6 +180,48 @@ async function cancelar(id) {
   return obtenerPorId(id);
 }
 
+async function obtenerBalance(query = {}) {
+  const desde = query.desde || null;
+  const hasta = query.hasta || null;
+  const resumen = await pool.query(
+    `SELECT
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pagado'), 0)::numeric AS ventas_pagadas,
+      COUNT(*) FILTER (WHERE payment_status = 'pagado')::int AS pedidos_pagados,
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pendiente'), 0)::numeric AS pagos_pendientes,
+      COUNT(*) FILTER (WHERE payment_status = 'pendiente')::int AS pedidos_pendientes,
+      COALESCE(SUM(total) FILTER (WHERE payment_status IN ('fallido','reembolsado')), 0)::numeric AS fallidos_y_reembolsados
+     FROM pedidos
+     WHERE ($1::date IS NULL OR fecha >= $1::date)
+       AND ($2::date IS NULL OR fecha < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const pagos = await pool.query(
+    `SELECT COALESCE(SUM(comision_estimada_cop) FILTER (WHERE estado = 'APPROVED'),0)::numeric AS comisiones_estimadas,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado = 'desembolsado'),0)::numeric AS desembolsado,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado <> 'desembolsado'),0)::numeric AS por_liquidar
+     FROM pagos
+     WHERE ($1::date IS NULL OR creado_en >= $1::date)
+       AND ($2::date IS NULL OR creado_en < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const totals = resumen.rows[0];
+  const paymentTotals = pagos.rows[0];
+  const ventas = Number(totals.ventas_pagadas);
+  const comisiones = Number(paymentTotals.comisiones_estimadas);
+  return {
+    desde, hasta,
+    ventasPagadas: ventas,
+    pedidosPagados: totals.pedidos_pagados,
+    pagosPendientes: Number(totals.pagos_pendientes),
+    pedidosPendientes: totals.pedidos_pendientes,
+    comisionesEstimadas: comisiones,
+    netoEstimado: ventas - comisiones,
+    desembolsadoRegistrado: Number(paymentTotals.desembolsado),
+    porLiquidar: Number(paymentTotals.por_liquidar),
+    nota: "Las comisiones son estimadas según PAYMENT_ESTIMATED_FEE_PERCENT. El desembolso real debe conciliarse con los reportes de Wompi."
+  };
+}
+
 async function crearCheckout(id) {
   await liberarReservasExpiradas();
   const pedido = await obtenerPorIdSinDetalle(id);
@@ -189,6 +234,16 @@ async function crearCheckout(id) {
   }
   if (!pedido.stock_reserva_activa) {
     throw ApiError.conflict("La reserva de stock de este pedido ya expiró. Crea un nuevo pedido para continuar.");
+  }
+
+  if (envConfig.payments.provider === "wompi") {
+    const checkout = wompiService.crearCheckout(pedido);
+    if (!pedido.wompi_reference) await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
+    await pool.query(
+      "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
+      [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
+    );
+    return { checkoutUrl: checkout.checkoutUrl, referencia: checkout.reference, proveedor: "wompi" };
   }
 
   if (pedido.shopify_checkout_url) {
@@ -323,6 +378,8 @@ module.exports = {
   cambiarEstado,
   cancelar,
   crearCheckout,
+  obtenerBalance,
   procesarWebhookShopify,
+  procesarWebhookWompi: wompiService.procesarEvento,
   liberarReservasExpiradas,
 };

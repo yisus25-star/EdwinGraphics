@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 
 const resultado = dotenv.config();
 
-console.log(resultado);
+if (resultado.error) console.warn("No se pudo cargar .env desde el directorio actual:", resultado.error.message);
 
 const { Pool } = require("pg");
 

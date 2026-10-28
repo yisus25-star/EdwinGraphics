@@ -1,7 +1,7 @@
 const pool = require("../config/db");
 
 const COLUMNAS = `id, producto_id, url, url_thumbnail, url_medium, url_large,
-  orden, es_principal, mime_type, ancho, alto, tamano_bytes`;
+  orden, es_principal, mime_type, ancho, alto, tamano_bytes, color_nombre`;
 
 async function obtenerPorProducto(productoId) {
   const resultado = await pool.query(
@@ -39,17 +39,25 @@ async function existePrincipalParaProducto(productoId, clienteDb = pool) {
 }
 
 async function crear(
-  { productoId, url, urlThumbnail, urlMedium, urlLarge, orden, esPrincipal = false, mimeType, ancho, alto, tamanoBytes },
+  { productoId, url, urlThumbnail, urlMedium, urlLarge, orden, esPrincipal = false, mimeType, ancho, alto, tamanoBytes, colorNombre = null },
   clienteDb = pool
 ) {
   const resultado = await clienteDb.query(
     `INSERT INTO producto_imagenes
-      (producto_id, url, url_thumbnail, url_medium, url_large, orden, es_principal, mime_type, ancho, alto, tamano_bytes)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      (producto_id, url, url_thumbnail, url_medium, url_large, orden, es_principal, mime_type, ancho, alto, tamano_bytes, color_nombre)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING ${COLUMNAS}`,
-    [productoId, url, urlThumbnail, urlMedium, urlLarge, orden, esPrincipal, mimeType, ancho, alto, tamanoBytes]
+    [productoId, url, urlThumbnail, urlMedium, urlLarge, orden, esPrincipal, mimeType, ancho, alto, tamanoBytes, colorNombre]
   );
   return resultado.rows[0];
+}
+
+async function actualizarColorNombre(id, colorNombre) {
+  const resultado = await pool.query(
+    `UPDATE producto_imagenes SET color_nombre = $1 WHERE id = $2 RETURNING ${COLUMNAS}`,
+    [colorNombre, id]
+  );
+  return resultado.rows[0] || null;
 }
 
 async function actualizarOrden(id, orden) {
@@ -102,6 +110,7 @@ module.exports = {
   contarPorProducto,
   existePrincipalParaProducto,
   crear,
+  actualizarColorNombre,
   actualizarOrden,
   quitarPrincipalDeProducto,
   marcarComoPrincipal,

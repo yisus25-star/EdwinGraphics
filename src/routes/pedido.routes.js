@@ -19,6 +19,7 @@ router.post("/", reglasCrearPedido, validateRequest, pedidoController.crear);
 
 // Consulta pública por id: permite hacer seguimiento del pedido con
 // el número recibido tras la compra (los clientes no tienen sesión).
+router.get("/balance", authMiddleware, adminMiddleware, pedidoController.obtenerBalance);
 router.get("/:id", reglasIdPedido, validateRequest, pedidoController.obtenerPorId);
 
 // Genera (o reutiliza) el enlace de pago de Shopify para el pedido.
