@@ -305,6 +305,22 @@
           <div class="admin-stat-card"><span>Por gestionar</span><strong id="adminStatPending">0</strong><small>Pedidos no finalizados</small></div>
         </div>
         
+        <section class="admin-form-box financial-dashboard" style="border-color:var(--red);">
+          <div class="admin-welcome"><div><span class="section-header-tag">FINANZAS</span><h3>Ventas y balance</h3><p>Resumen basado en pedidos y pagos registrados en el backend.</p></div></div>
+          <div class="financial-filters">
+            <label>Desde <input type="date" id="balanceDesde"></label>
+            <label>Hasta <input type="date" id="balanceHasta"></label>
+            <button type="button" class="btn-add-cart" onclick="loadFinancialBalance()">Consultar</button>
+          </div>
+          <div class="admin-stats-grid financial-stats">
+            <div class="admin-stat-card"><span>Ventas pagadas</span><strong id="balanceVentas">$0</strong><small id="balancePedidos">0 pedidos</small></div>
+            <div class="admin-stat-card"><span>Pagos pendientes</span><strong id="balancePendiente">$0</strong><small id="balancePedidosPendientes">0 pedidos</small></div>
+            <div class="admin-stat-card"><span>Comisiones estimadas</span><strong id="balanceComisiones">$0</strong><small>Según la tasa configurada</small></div>
+            <div class="admin-stat-card"><span>Neto estimado</span><strong id="balanceNeto">$0</strong><small>No equivale a desembolso confirmado</small></div>
+          </div>
+          <p id="balanceNota" class="financial-note">Carga el balance para consultar los datos.</p>
+        </section>
+
         <div class="admin-form-box" style="border-color:var(--red);">
           <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
           <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Configura las credenciales y el modo de Shopify en las variables de entorno del servidor. No guardes tokens ni claves en este panel.</p>
