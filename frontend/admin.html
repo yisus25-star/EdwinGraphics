@@ -323,7 +323,7 @@
 
         <div class="admin-form-box" style="border-color:var(--red);">
           <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
-          <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Configura las credenciales y el modo de Shopify en las variables de entorno del servidor. No guardes tokens ni claves en este panel.</p>
+          <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Para activar Wompi configura PAYMENT_PROVIDER=wompi, WOMPI_PUBLIC_KEY, WOMPI_INTEGRITY_SECRET y WOMPI_EVENTS_SECRET en el .env del servidor. Nunca pegues llaves privadas en el frontend ni en este panel.</p>
         </div>
 
         <!-- SECCIÓN: AÑADIR PRODUCTO -->
