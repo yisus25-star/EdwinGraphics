@@ -78,3 +78,13 @@
 .editor-image-meta label { padding:0; }
 .editor-image-meta button { width:100%; }
 @media(max-width:700px) { .new-product-image-preview { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+
+.financial-dashboard { margin: 0 0 24px; }
+.financial-dashboard .admin-welcome { margin-bottom:18px; }
+.financial-filters { display:flex; align-items:end; flex-wrap:wrap; gap:12px; margin:16px 0 20px; }
+.financial-filters label { display:flex; flex-direction:column; gap:6px; color:#b9bdc7; font-size:12px; font-weight:700; }
+.financial-filters input { min-height:42px; padding:8px 10px; color:#fff; color-scheme:dark; background:#0c0d11; border:1px solid #343741; border-radius:9px; }
+.financial-stats { margin-bottom:12px; }
+.financial-stats .admin-stat-card strong { overflow-wrap:anywhere; }
+.financial-note { color:#a8adb7; font-size:12px; line-height:1.6; margin:10px 0 0; }
