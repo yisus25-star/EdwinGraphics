@@ -14,7 +14,16 @@ module.exports = {
     baseUrl: process.env.UPLOAD_BASE_URL || "/uploads",
     maxFileSizeMb: parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB, 10) || 5,
   },
-  payments: {\n    provider: (process.env.PAYMENT_PROVIDER || "shopify").toLowerCase(),\n    wompiPublicKey: process.env.WOMPI_PUBLIC_KEY || "",\n    wompiIntegritySecret: process.env.WOMPI_INTEGRITY_SECRET || "",\n    wompiEventsSecret: process.env.WOMPI_EVENTS_SECRET || "",\n    wompiEnvironment: (process.env.WOMPI_ENVIRONMENT || "sandbox").toLowerCase(),\n    baseUrl: process.env.PUBLIC_BASE_URL || "http://localhost:3000",\n    estimatedFeePercent: Number(process.env.PAYMENT_ESTIMATED_FEE_PERCENT || 0),\n  },\n  shopify: {
+  payments: {
+    provider: (process.env.PAYMENT_PROVIDER || "shopify").toLowerCase(),
+    wompiPublicKey: process.env.WOMPI_PUBLIC_KEY || "",
+    wompiIntegritySecret: process.env.WOMPI_INTEGRITY_SECRET || "",
+    wompiEventsSecret: process.env.WOMPI_EVENTS_SECRET || "",
+    wompiEnvironment: (process.env.WOMPI_ENVIRONMENT || "sandbox").toLowerCase(),
+    baseUrl: process.env.PUBLIC_BASE_URL || "http://localhost:3000",
+    estimatedFeePercent: Number(process.env.PAYMENT_ESTIMATED_FEE_PERCENT || 0),
+  },
+  shopify: {
     storeDomain: process.env.SHOPIFY_STORE_DOMAIN || "",
     adminApiToken: process.env.SHOPIFY_ADMIN_API_TOKEN || "",
     apiVersion: process.env.SHOPIFY_API_VERSION || "2026-07",
