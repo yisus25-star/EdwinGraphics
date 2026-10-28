@@ -180,6 +180,48 @@ async function cancelar(id) {
   return obtenerPorId(id);
 }
 
+async function obtenerBalance(query = {}) {
+  const desde = query.desde || null;
+  const hasta = query.hasta || null;
+  const resumen = await pool.query(
+    `SELECT
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pagado'), 0)::numeric AS ventas_pagadas,
+      COUNT(*) FILTER (WHERE payment_status = 'pagado')::int AS pedidos_pagados,
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pendiente'), 0)::numeric AS pagos_pendientes,
+      COUNT(*) FILTER (WHERE payment_status = 'pendiente')::int AS pedidos_pendientes,
+      COALESCE(SUM(total) FILTER (WHERE payment_status IN ('fallido','reembolsado')), 0)::numeric AS fallidos_y_reembolsados
+     FROM pedidos
+     WHERE ($1::date IS NULL OR fecha >= $1::date)
+       AND ($2::date IS NULL OR fecha < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const pagos = await pool.query(
+    `SELECT COALESCE(SUM(comision_estimada_cop) FILTER (WHERE estado = 'APPROVED'),0)::numeric AS comisiones_estimadas,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado = 'desembolsado'),0)::numeric AS desembolsado,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado <> 'desembolsado'),0)::numeric AS por_liquidar
+     FROM pagos
+     WHERE ($1::date IS NULL OR creado_en >= $1::date)
+       AND ($2::date IS NULL OR creado_en < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const totals = resumen.rows[0];
+  const paymentTotals = pagos.rows[0];
+  const ventas = Number(totals.ventas_pagadas);
+  const comisiones = Number(paymentTotals.comisiones_estimadas);
+  return {
+    desde, hasta,
+    ventasPagadas: ventas,
+    pedidosPagados: totals.pedidos_pagados,
+    pagosPendientes: Number(totals.pagos_pendientes),
+    pedidosPendientes: totals.pedidos_pendientes,
+    comisionesEstimadas: comisiones,
+    netoEstimado: ventas - comisiones,
+    desembolsadoRegistrado: Number(paymentTotals.desembolsado),
+    porLiquidar: Number(paymentTotals.por_liquidar),
+    nota: "Las comisiones son estimadas según PAYMENT_ESTIMATED_FEE_PERCENT. El desembolso real debe conciliarse con los reportes de Wompi."
+  };
+}
+
 async function crearCheckout(id) {
   await liberarReservasExpiradas();
   const pedido = await obtenerPorIdSinDetalle(id);
@@ -336,6 +378,7 @@ module.exports = {
   cambiarEstado,
   cancelar,
   crearCheckout,
+  obtenerBalance,
   procesarWebhookShopify,
   procesarWebhookWompi: wompiService.procesarEvento,
   liberarReservasExpiradas,
