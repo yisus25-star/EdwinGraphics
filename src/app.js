@@ -12,6 +12,7 @@ const webhookRoutes = require("./routes/webhook.routes");
 const notFound = require("./middlewares/notFound.middleware");
 const errorHandler = require("./middlewares/errorHandler.middleware");
 const envConfig = require("./config/env");
+const pedidoService = require("./services/pedido.service");
 
 const app = express();
 
@@ -28,6 +29,17 @@ app.use(cors());
 app.use("/webhooks", webhookRoutes);
 
 app.use(express.json());
+
+// Wompi envía eventos firmados; el servicio valida el checksum antes de actualizar un pedido.
+app.post("/webhooks/wompi", async (req, res) => {
+  try {
+    await pedidoService.procesarWebhookWompi(req.body);
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("Webhook Wompi rechazado:", error.message);
+    return res.status(400).json({ received: false });
+  }
+});
 
 // Archivos de imágenes subidos localmente (Multer). Si en el futuro se
 // usa Cloudinary, esta línea deja de ser necesaria pero no afecta nada.
