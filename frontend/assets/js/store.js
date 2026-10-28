@@ -474,7 +474,7 @@
       if (sessionStorage.getItem(TOKEN_KEY) && adminLoginView && adminDashboardView) {
         adminLoginView.style.display = 'none';
         adminDashboardView.style.display = 'flex';
-        Promise.all([loadCategories(), loadProducts(), loadOrders()])
+        Promise.all([loadCategories(), loadProducts(), loadOrders(), loadFinancialBalance()])
           .catch(() => {
             sessionStorage.removeItem(TOKEN_KEY);
             adminLoginView.style.display = 'block';
@@ -871,11 +871,35 @@
         sessionStorage.setItem(TOKEN_KEY, data.token);
         document.getElementById('adminLoginView').style.display = 'none';
         document.getElementById('adminDashboardView').style.display = 'flex';
-        await Promise.all([loadCategories(), loadProducts(), loadOrders()]);
+        await Promise.all([loadCategories(), loadProducts(), loadOrders(), loadFinancialBalance()]);
         showToast('Sesión administrativa iniciada');
       } catch (error) {
         sessionStorage.removeItem(TOKEN_KEY);
         showToast(error.message, 'fa-triangle-exclamation');
+      }
+    }
+
+    async function loadFinancialBalance() {
+      const note = document.getElementById('balanceNota');
+      if (!note) return;
+      note.textContent = 'Consultando balance…';
+      const params = new URLSearchParams();
+      const desde = document.getElementById('balanceDesde')?.value;
+      const hasta = document.getElementById('balanceHasta')?.value;
+      if (desde) params.set('desde', desde);
+      if (hasta) params.set('hasta', hasta);
+      try {
+        const balance = await apiRequest('/pedidos/balance' + (params.size ? '?' + params.toString() : ''));
+        const money = value => formatPriceDisplay(Number(value || 0));
+        document.getElementById('balanceVentas').textContent = money(balance.ventasPagadas);
+        document.getElementById('balancePedidos').textContent = balance.pedidosPagados + ' pedidos pagados';
+        document.getElementById('balancePendiente').textContent = money(balance.pagosPendientes);
+        document.getElementById('balancePedidosPendientes').textContent = balance.pedidosPendientes + ' pedidos pendientes';
+        document.getElementById('balanceComisiones').textContent = money(balance.comisionesEstimadas);
+        document.getElementById('balanceNeto').textContent = money(balance.netoEstimado);
+        note.textContent = balance.nota + ' Por liquidar: ' + money(balance.porLiquidar) + '.';
+      } catch (error) {
+        note.textContent = 'No se pudo cargar el balance: ' + error.message;
       }
     }
 
