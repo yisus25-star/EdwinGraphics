@@ -237,8 +237,22 @@ async function crearCheckout(id) {
   }
 
   if (envConfig.payments.provider === "wompi") {
-    const checkout = wompiService.crearCheckout(pedido);
-    if (!pedido.wompi_reference) await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
+    const ultimoPagoResult = await pool.query(
+      "SELECT referencia, estado FROM pagos WHERE pedido_id = $1 ORDER BY creado_en DESC LIMIT 1",
+      [id]
+    );
+    const ultimoPago = ultimoPagoResult.rows[0];
+    const estadoReutilizable = ultimoPago && ["PENDING", "IN_PROCESS"].includes(ultimoPago.estado);
+    // Reutiliza el enlace mientras el pago siga en curso. Si Wompi ya lo
+    // rechazó o terminó, genera una referencia nueva para el siguiente intento.
+    const pedidoParaCheckout = estadoReutilizable
+      ? { ...pedido, wompi_reference: ultimoPago.referencia }
+      : { ...pedido, wompi_reference: null };
+    const checkout = wompiService.crearCheckout(pedidoParaCheckout);
+
+    if (checkout.reference !== pedido.wompi_reference) {
+      await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
+    }
     await pool.query(
       "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
       [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
