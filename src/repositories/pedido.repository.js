@@ -3,6 +3,7 @@ const pool = require("../config/db");
 const COLUMNAS = `
   id, cliente_id, direccion_id, fecha, estado, subtotal, envio, total, metodo_pago,
   shopify_checkout_id, shopify_checkout_url, shopify_order_id, shopify_order_number,
+  wompi_reference, wompi_transaction_id, payment_method_type, payment_updated_at,
   payment_status, stock_reserva_activa, stock_reserva_expira_en, observaciones
 `;
 
