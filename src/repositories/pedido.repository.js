@@ -133,7 +133,7 @@ async function obtenerReservasExpiradas(limit = 25, clienteDb = pool) {
     `SELECT ${COLUMNAS}
      FROM pedidos
      WHERE stock_reserva_activa = TRUE
-       AND payment_status = 'pendiente'
+       AND payment_status IN ('pendiente', 'fallido')
        AND estado = 'Pendiente'
        AND stock_reserva_expira_en IS NOT NULL
        AND stock_reserva_expira_en <= NOW()
