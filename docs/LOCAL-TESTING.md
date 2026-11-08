@@ -40,7 +40,8 @@ El backend debe permitir CORS desde el origen del frontend.
 - Navegación: comprueba que Inicio, Catálogo y Admin abran sus páginas separadas.
 - Imagen principal: coloca una imagen autorizada en `frontend/assets/images/hero-moto.jpg`; si no está, la página muestra un fondo de respaldo.
 - Seguridad: verifica que las rutas de administración rechacen peticiones sin token y que la tienda pública siga funcionando sin iniciar sesión.
-- Pago real: desactiva el modo MOCK únicamente después de configurar credenciales de Shopify, dominio, secretos de webhook y suscripciones de webhooks necesarias.
+- Pago Wompi en sandbox: configura `PAYMENT_PROVIDER=wompi`, `WOMPI_ENVIRONMENT=sandbox`, una llave `pub_test_...`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET` y `PUBLIC_BASE_URL` apuntando al frontend local. Ejecuta `npm.cmd run migrate` y `npm.cmd test`; luego crea un pedido de prueba, confirma que abre el checkout de Wompi y valida que el webhook actualice el pedido y el balance. Wompi no puede llamar a `localhost`: para probar el webhook necesitas exponer temporalmente el backend mediante HTTPS y registrar esa URL en el Dashboard de sandbox.
+- Pago real: cambia a `WOMPI_ENVIRONMENT=production` y usa llaves de producción únicamente cuando sandbox haya pasado las pruebas, el backend esté publicado con HTTPS y la URL de eventos esté configurada. Nunca compartas ni subas secretos.
 
 ## Seguridad de credenciales
 
