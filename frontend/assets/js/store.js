@@ -833,14 +833,14 @@
           sessionStorage.setItem('edwingraphics_pending_order', String(order.id));
         }
         const checkout = await apiRequest('/pedidos/' + order.id + '/checkout', { method: 'POST', body: JSON.stringify({}) });
-        if (!checkout.checkoutUrl) throw new Error('El pedido se creó, pero Shopify no devolvió un enlace de pago. Contacta soporte con el pedido #' + order.id + '.');
+        if (!checkout.checkoutUrl) throw new Error('El pedido se creó, pero la pasarela no devolvió un enlace de pago. Contacta soporte con el pedido #' + order.id + '.');
         sessionStorage.removeItem('edwingraphics_pending_order');
         cart = [];
         updateCart();
         closeSysModals();
         if (String(checkout.checkoutUrl).includes('checkout.simulado.local')) {
           showToast('Pedido #' + order.id + ' creado en modo de prueba. No se realizó ningún cobro.');
-          alert('Modo de prueba\n\nPedido #' + order.id + ' creado correctamente.\nNo se realizó ningún cobro.\n\nPara recibir pagos reales, configura Shopify en el backend.');
+          alert('Modo de prueba\n\nPedido #' + order.id + ' creado correctamente.\nNo se realizó ningún cobro.\n\nPara recibir pagos reales, configura la pasarela elegida en el backend.');
         } else {
           showToast('Pedido #' + order.id + ' creado. Abriendo el pago seguro…');
           window.location.href = checkout.checkoutUrl;
