@@ -565,7 +565,7 @@
       }
       grid.innerHTML = filtered.map(product =>
         '<article class="catalog-card"><div class="product-img-box product-card-media">' +
-        (product.img ? '<img loading="lazy" decoding="async" src="' + escapeHtml(mediaUrl(product.img)) + '" alt="' + escapeHtml(product.name) + '" onerror="this.style.display=\\'none\\';this.parentElement.classList.add(\'image-unavailable\')">' : '<div class="product-placeholder">EDWINGRAPHICS</div>') +
+        (product.img ? '<img loading="lazy" decoding="async" src="' + escapeHtml(mediaUrl(product.img)) + '" alt="' + escapeHtml(product.name) + '" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'image-unavailable\')">' : '<div class="product-placeholder">EDWINGRAPHICS</div>') +
         '<button type="button" class="product-image-open" onclick="openDetailsModal(' + product.id + ')" aria-label="Ver fotos de ' + escapeHtml(product.name) + '"><i class="fa-solid fa-images"></i><span>Ver fotos</span></button>' +
         (product.outOfStock ? '<span class="out-of-stock-badge">Agotado</span>' : '') +
         '</div><span class="product-tag">' + escapeHtml(product.tag) + '</span>' +
