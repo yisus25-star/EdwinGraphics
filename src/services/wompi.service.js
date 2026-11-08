@@ -86,7 +86,7 @@ async function procesarEvento(evento) {
   try {
     await client.query("BEGIN");
     const result = await client.query(
-      "SELECT * FROM pagos WHERE referencia = $1 FOR UPDATE",
+      "SELECT pagos.*, pedidos.stock_reserva_activa, pedidos.stock_reserva_expira_en, pedidos.estado AS pedido_estado, pedidos.payment_status AS pedido_payment_status FROM pagos JOIN pedidos ON pedidos.id = pagos.pedido_id WHERE pagos.referencia = $1 FOR UPDATE OF pagos, pedidos",
       [tx.reference]
     );
     const payment = result.rows[0];
@@ -107,14 +107,30 @@ async function procesarEvento(evento) {
     );
 
     if (tx.status === "APPROVED") {
-      await client.query(
-        "UPDATE pedidos SET estado='Pagado', payment_status='pagado', wompi_transaction_id=$1, payment_method_type=$2, payment_updated_at=NOW(), stock_reserva_activa=FALSE, stock_reserva_expira_en=NULL WHERE id=$3 AND payment_status <> 'pagado'",
-        [tx.id, tx.payment_method_type || null, payment.pedido_id]
-      );
-      await client.query(
-        "UPDATE pagos SET desembolso_estado='por_liquidar' WHERE id=$1",
-        [payment.id]
-      );
+      // Un enlace antiguo puede aprobarse después de liberar/cancelar la reserva.
+      // En ese caso no confirmamos una venta sin stock: queda para conciliación manual.
+      const reservaVigente =
+        payment.stock_reserva_activa === true &&
+        payment.pedido_estado === "Pendiente" &&
+        ["pendiente", "fallido"].includes(payment.pedido_payment_status) &&
+        payment.stock_reserva_expira_en &&
+        new Date(payment.stock_reserva_expira_en).getTime() > Date.now();
+
+      if (!reservaVigente) {
+        await client.query(
+          "UPDATE pagos SET desembolso_estado='requiere_revision' WHERE id=$1",
+          [payment.id]
+        );
+      } else {
+        await client.query(
+          "UPDATE pedidos SET estado='Pagado', payment_status='pagado', wompi_transaction_id=$1, payment_method_type=$2, payment_updated_at=NOW(), stock_reserva_activa=FALSE, stock_reserva_expira_en=NULL WHERE id=$3 AND payment_status <> 'pagado'",
+          [tx.id, tx.payment_method_type || null, payment.pedido_id]
+        );
+        await client.query(
+          "UPDATE pagos SET desembolso_estado='por_liquidar' WHERE id=$1",
+          [payment.id]
+        );
+      }
     } else if (["DECLINED", "ERROR", "VOIDED"].includes(tx.status)) {
       await client.query(
         "UPDATE pedidos SET payment_status='fallido', payment_updated_at=NOW() WHERE id=$1 AND payment_status <> 'pagado'",
