@@ -7,7 +7,6 @@ const categoriaRoutes = require("./routes/categoria.routes");
 const clienteRoutes = require("./routes/cliente.routes");
 const pedidoRoutes = require("./routes/pedido.routes");
 const authRoutes = require("./routes/auth.routes");
-const webhookRoutes = require("./routes/webhook.routes");
 
 const notFound = require("./middlewares/notFound.middleware");
 const errorHandler = require("./middlewares/errorHandler.middleware");
@@ -20,13 +19,6 @@ const app = express();
 // Middlewares
 // ==========================
 app.use(cors());
-
-// Los webhooks de Shopify se montan ANTES de express.json() a
-// propósito: necesitan el cuerpo crudo (sin parsear) para poder
-// verificar la firma HMAC. Esta ruta trae su propio express.raw()
-// (ver routes/webhook.routes.js), así que debe registrarse antes de
-// que el parser JSON global consuma el stream de la petición.
-app.use("/webhooks", webhookRoutes);
 
 app.use(express.json());
 
