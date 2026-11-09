@@ -60,6 +60,10 @@ function calcularExpiracionReserva() {
 }
 
 async function crear(datosPedido) {
+  if (envConfig.payments.provider !== "wompi") {
+    throw ApiError.serviceUnavailable("La pasarela de pago no está habilitada. Configura Wompi en el servidor.");
+  }
+  wompiService.validarConfiguracionCheckout(envConfig.payments);
   await liberarReservasExpiradas();
 
   const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items, observaciones = null } = datosPedido;
