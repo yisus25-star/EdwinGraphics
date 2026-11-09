@@ -5,7 +5,7 @@
 1. Asegúrate de tener Node.js 24 y PostgreSQL instalados.
 2. En la raíz del repositorio, copia `.env.example` como `.env`.
 3. Completa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` y un `JWT_SECRET` aleatorio.
-4. Para probar el flujo de pedidos sin cobrar, conserva `SHOPIFY_MOCK=true`. En este modo se crea el pedido y se muestra una confirmación de simulación; no se abre una pasarela falsa ni se realiza ningún cobro.
+4. Shopify fue retirado. Wompi es el único proveedor de pagos. Sin credenciales válidas, el checkout debe rechazar la solicitud sin crear una URL de pago; configura primero las llaves de sandbox.
 
 ## 2. Instalar, migrar y arrancar
 
@@ -18,7 +18,7 @@ npm run migrate
 npm run dev
 ```
 
-El backend debe escuchar en el puerto configurado (por defecto 3000). No ejecutes migraciones sobre producción sin respaldo y revisión previa.
+El backend debe escuchar en el puerto configurado (por defecto 3000). Shopify ya no forma parte del código activo. No ejecutes migraciones sobre producción sin respaldo y revisión previa.
 
 ## 3. Abrir la tienda
 
@@ -35,7 +35,7 @@ El backend debe permitir CORS desde el origen del frontend.
 - Catálogo: productos cargan desde PostgreSQL; busca por nombre, descripción o moto compatible y filtra por categoría.
 - Detalle: abre un producto y revisa su galería si tiene imágenes.
 - Carrito: añade varios productos, aumenta cantidades y quita productos.
-- Pedido: completa nombre, correo, teléfono, departamento, ciudad, dirección y observaciones; crea un pedido con el modo de prueba activo. Debe aparecer el número de pedido y avisar que no hubo cobro.
+- Pedido: completa nombre, correo, teléfono, departamento, ciudad, dirección y observaciones. Con Wompi sin credenciales, el backend debe informar que falta configuración y nunca simular un cobro.
 - Administración: inicia sesión con un administrador ya creado en la base de datos; comprueba creación/edición/activación/eliminación de productos, carga de imágenes, gestión de categorías, listado/cambio de estado de pedidos, tarjetas de resumen y exportación CSV.
 - Navegación: comprueba que Inicio, Catálogo y Admin abran sus páginas separadas.
 - Imagen principal: coloca una imagen autorizada en `frontend/assets/images/hero-moto.jpg`; si no está, la página muestra un fondo de respaldo.
