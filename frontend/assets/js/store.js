@@ -359,6 +359,11 @@
       if (grid) grid.innerHTML = '<div class="no-products">Cargando catálogo…</div>';
       try {
         await loadCategories();
+        const params = new URLSearchParams(window.location.search);
+        const searchInput = document.getElementById('catalogSearch');
+        const categoryFilter = document.getElementById('catalogCategory');
+        if (searchInput && params.has('q')) searchInput.value = params.get('q');
+        if (categoryFilter && params.has('categoria')) categoryFilter.value = params.get('categoria');
         await loadProducts();
         await loadBestSellers();
         renderCategoryControls();
