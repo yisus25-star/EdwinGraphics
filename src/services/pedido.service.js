@@ -234,33 +234,29 @@ async function crearCheckout(id) {
   if (!pedido.stock_reserva_activa) {
     throw ApiError.conflict("La reserva de stock de este pedido ya expiró. Crea un nuevo pedido para continuar.");
   }
-
   if (envConfig.payments.provider !== "wompi") {
     throw ApiError.serviceUnavailable("La pasarela de pago no está habilitada. Configura Wompi en el servidor.");
   }
 
-    const ultimoPagoResult = await pool.query(
-      "SELECT referencia, estado FROM pagos WHERE pedido_id = $1 ORDER BY creado_en DESC LIMIT 1",
-      [id]
-    );
-    const ultimoPago = ultimoPagoResult.rows[0];
-    const estadoReutilizable = ultimoPago && ["PENDING", "IN_PROCESS"].includes(ultimoPago.estado);
-    // Reutiliza el enlace mientras el pago siga en curso. Si Wompi ya lo
-    // rechazó o terminó, genera una referencia nueva para el siguiente intento.
-    const pedidoParaCheckout = estadoReutilizable
-      ? { ...pedido, wompi_reference: ultimoPago.referencia }
-      : { ...pedido, wompi_reference: null };
-    const checkout = wompiService.crearCheckout(pedidoParaCheckout);
+  const ultimoPagoResult = await pool.query(
+    "SELECT referencia, estado FROM pagos WHERE pedido_id = $1 ORDER BY creado_en DESC LIMIT 1",
+    [id]
+  );
+  const ultimoPago = ultimoPagoResult.rows[0];
+  const estadoReutilizable = ultimoPago && ["PENDING", "IN_PROCESS"].includes(ultimoPago.estado);
+  const pedidoParaCheckout = estadoReutilizable
+    ? { ...pedido, wompi_reference: ultimoPago.referencia }
+    : { ...pedido, wompi_reference: null };
+  const checkout = wompiService.crearCheckout(pedidoParaCheckout);
 
-    if (checkout.reference !== pedido.wompi_reference) {
-      await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
-    }
-    await pool.query(
-      "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
-      [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
-    );
-    return { checkoutUrl: checkout.checkoutUrl, referencia: checkout.reference, proveedor: "wompi" };
+  if (checkout.reference !== pedido.wompi_reference) {
+    await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
   }
+  await pool.query(
+    "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
+    [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
+  );
+  return { checkoutUrl: checkout.checkoutUrl, referencia: checkout.reference, proveedor: "wompi" };
 }
 
 async function liberarReservasExpiradas() {
