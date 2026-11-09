@@ -5,7 +5,7 @@
 1. Asegúrate de tener Node.js 24 y PostgreSQL instalados.
 2. En la raíz del repositorio, copia `.env.example` como `.env`.
 3. Completa `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` y un `JWT_SECRET` aleatorio.
-4. Wompi fue retirado. Wompi es el único proveedor de pagos. Sin credenciales válidas, el checkout debe rechazar la solicitud sin crear una URL de pago; configura primero las llaves de sandbox.
+4. Wompi es el único proveedor de pagos. Sin credenciales válidas, el checkout debe rechazar la solicitud sin crear una URL de pago; configura primero las llaves de sandbox.
 
 ## 2. Instalar, migrar y arrancar
 
@@ -18,7 +18,7 @@ npm run migrate
 npm run dev
 ```
 
-El backend debe escuchar en el puerto configurado (por defecto 3000). Wompi ya no forma parte del código activo. No ejecutes migraciones sobre producción sin respaldo y revisión previa.
+El backend debe escuchar en el puerto configurado (por defecto 3000). La migración `20261108_02_remove_shopify.sql` elimina los metadatos y la tabla de webhooks que pertenecían a la integración anterior. Haz un respaldo antes de ejecutarla; no ejecutes migraciones sobre producción sin revisión previa.
 
 ## 3. Abrir la tienda
 
