@@ -22,6 +22,7 @@ module.exports = {
     wompiEnvironment: (process.env.WOMPI_ENVIRONMENT || "sandbox").toLowerCase(),
     baseUrl: process.env.PUBLIC_BASE_URL || "http://localhost:3000",
     estimatedFeePercent: Number(process.env.PAYMENT_ESTIMATED_FEE_PERCENT || 0),
+    reservationMinutes: parseInt(process.env.PAYMENT_RESERVATION_MINUTES, 10) || 30,
   },
   shopify: {
     storeDomain: process.env.SHOPIFY_STORE_DOMAIN || "",
