@@ -15,7 +15,7 @@ module.exports = {
     maxFileSizeMb: parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB, 10) || 5,
   },
   payments: {
-    provider: (process.env.PAYMENT_PROVIDER || "shopify").toLowerCase(),
+    provider: (process.env.PAYMENT_PROVIDER || "wompi").toLowerCase(),
     wompiPublicKey: process.env.WOMPI_PUBLIC_KEY || "",
     wompiIntegritySecret: process.env.WOMPI_INTEGRITY_SECRET || "",
     wompiEventsSecret: process.env.WOMPI_EVENTS_SECRET || "",
@@ -30,7 +30,7 @@ module.exports = {
     clientSecret: process.env.SHOPIFY_CLIENT_SECRET || "",
     currency: process.env.SHOPIFY_CURRENCY || "COP",
     webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || process.env.SHOPIFY_CLIENT_SECRET || "",
-    reservationMinutes: parseInt(process.env.SHOPIFY_RESERVATION_MINUTES, 10) || 30,
+    reservationMinutes: parseInt(process.env.PAYMENT_RESERVATION_MINUTES, 10) || 30,
     mock: process.env.SHOPIFY_MOCK === "true",
   },
 };
