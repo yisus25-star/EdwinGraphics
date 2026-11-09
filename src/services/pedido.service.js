@@ -3,13 +3,14 @@ const detallePedidoRepository = require("../repositories/detallePedido.repositor
 const productoRepository = require("../repositories/producto.repository");
 const clienteRepository = require("../repositories/cliente.repository");
 const direccionRepository = require("../repositories/direccion.repository");
-const shopifyService = require("./shopify.service");
 
 const ApiError = require("../utils/ApiError");
 const withTransaction = require("../utils/withTransaction");
 const { getPagination, buildPaginationMeta } = require("../utils/pagination");
 const { ESTADOS_VALIDOS } = require("../validators/pedido.validator");
 const envConfig = require("../config/env");
+const wompiService = require("./wompi.service");
+const pool = require("../config/db");
 
 const ESTADOS_NO_CANCELABLES = ["Entregado", "Cancelado"];
 
@@ -54,14 +55,18 @@ async function procesarItemsPedido(items, client) {
 }
 
 function calcularExpiracionReserva() {
-  const fecha = new Date(Date.now() + envConfig.shopify.reservationMinutes * 60 * 1000);
+  const fecha = new Date(Date.now() + envConfig.payments.reservationMinutes * 60 * 1000);
   return fecha;
 }
 
 async function crear(datosPedido) {
+  if (envConfig.payments.provider !== "wompi") {
+    throw ApiError.serviceUnavailable("La pasarela de pago no está habilitada. Configura Wompi en el servidor.");
+  }
+  wompiService.validarConfiguracionCheckout(envConfig.payments);
   await liberarReservasExpiradas();
 
-  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items } = datosPedido;
+  const { cliente, direccion, metodo_pago: metodoPago, envio = 0, items, observaciones = null } = datosPedido;
   const pedidoCreado = await withTransaction(async (client) => {
     const clienteRegistrado = await buscarOCrearCliente(cliente, client);
     const direccionRegistrada = await direccionRepository.crear(
@@ -80,6 +85,7 @@ async function crear(datosPedido) {
         total,
         metodoPago,
         reservaExpiraEn: calcularExpiracionReserva(),
+        observaciones,
       },
       client
     );
@@ -177,6 +183,48 @@ async function cancelar(id) {
   return obtenerPorId(id);
 }
 
+async function obtenerBalance(query = {}) {
+  const desde = query.desde || null;
+  const hasta = query.hasta || null;
+  const resumen = await pool.query(
+    `SELECT
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pagado'), 0)::numeric AS ventas_pagadas,
+      COUNT(*) FILTER (WHERE payment_status = 'pagado')::int AS pedidos_pagados,
+      COALESCE(SUM(total) FILTER (WHERE payment_status = 'pendiente'), 0)::numeric AS pagos_pendientes,
+      COUNT(*) FILTER (WHERE payment_status = 'pendiente')::int AS pedidos_pendientes,
+      COALESCE(SUM(total) FILTER (WHERE payment_status IN ('fallido','reembolsado')), 0)::numeric AS fallidos_y_reembolsados
+     FROM pedidos
+     WHERE ($1::date IS NULL OR fecha >= $1::date)
+       AND ($2::date IS NULL OR fecha < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const pagos = await pool.query(
+    `SELECT COALESCE(SUM(comision_estimada_cop) FILTER (WHERE estado = 'APPROVED'),0)::numeric AS comisiones_estimadas,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado = 'desembolsado'),0)::numeric AS desembolsado,
+      COALESCE(SUM(monto_cop) FILTER (WHERE estado = 'APPROVED' AND desembolso_estado <> 'desembolsado'),0)::numeric AS por_liquidar
+     FROM pagos
+     WHERE ($1::date IS NULL OR creado_en >= $1::date)
+       AND ($2::date IS NULL OR creado_en < ($2::date + INTERVAL '1 day'))`,
+    [desde, hasta]
+  );
+  const totals = resumen.rows[0];
+  const paymentTotals = pagos.rows[0];
+  const ventas = Number(totals.ventas_pagadas);
+  const comisiones = Number(paymentTotals.comisiones_estimadas);
+  return {
+    desde, hasta,
+    ventasPagadas: ventas,
+    pedidosPagados: totals.pedidos_pagados,
+    pagosPendientes: Number(totals.pagos_pendientes),
+    pedidosPendientes: totals.pedidos_pendientes,
+    comisionesEstimadas: comisiones,
+    netoEstimado: ventas - comisiones,
+    desembolsadoRegistrado: Number(paymentTotals.desembolsado),
+    porLiquidar: Number(paymentTotals.por_liquidar),
+    nota: "Las comisiones son estimadas según PAYMENT_ESTIMATED_FEE_PERCENT. El desembolso real debe conciliarse con los reportes de Wompi."
+  };
+}
+
 async function crearCheckout(id) {
   await liberarReservasExpiradas();
   const pedido = await obtenerPorIdSinDetalle(id);
@@ -190,93 +238,31 @@ async function crearCheckout(id) {
   if (!pedido.stock_reserva_activa) {
     throw ApiError.conflict("La reserva de stock de este pedido ya expiró. Crea un nuevo pedido para continuar.");
   }
-
-  if (pedido.shopify_checkout_url) {
-    return {
-      checkoutUrl: pedido.shopify_checkout_url,
-      shopifyCheckoutId: pedido.shopify_checkout_id,
-    };
+  if (envConfig.payments.provider !== "wompi") {
+    throw ApiError.serviceUnavailable("La pasarela de pago no está habilitada. Configura Wompi en el servidor.");
   }
 
-  const [detalle, cliente, direccion] = await Promise.all([
-    detallePedidoRepository.obtenerPorPedido(id),
-    clienteRepository.obtenerPorId(pedido.cliente_id),
-    pedido.direccion_id ? direccionRepository.obtenerPorId(pedido.direccion_id) : null,
-  ]);
-
-  const pedidoParaShopify = { ...pedido, cliente, direccion };
-  const { shopifyCheckoutId, checkoutUrl } = await shopifyService.crearCheckout(pedidoParaShopify, detalle);
-
-  await pedidoRepository.actualizarCampos(id, {
-    shopify_checkout_id: shopifyCheckoutId,
-    shopify_checkout_url: checkoutUrl,
-    stock_reserva_expira_en: calcularExpiracionReserva(),
-  });
-
-  return { checkoutUrl, shopifyCheckoutId };
-}
-
-function extraerAtributos(payloadShopify) {
-  return payloadShopify.note_attributes || payloadShopify.custom_attributes || payloadShopify.customAttributes || [];
-}
-
-function extraerPedidoIdDesdeNotas(payloadShopify) {
-  const atributos = extraerAtributos(payloadShopify);
-  const atributoPedido = atributos.find(
-    (atributo) => atributo.name === "edwingraphics_pedido_id" || atributo.key === "edwingraphics_pedido_id"
+  const ultimoPagoResult = await pool.query(
+    "SELECT referencia, estado FROM pagos WHERE pedido_id = $1 ORDER BY creado_en DESC LIMIT 1",
+    [id]
   );
-  if (!atributoPedido) return null;
-  const pedidoId = parseInt(atributoPedido.value, 10);
-  return Number.isInteger(pedidoId) ? pedidoId : null;
+  const ultimoPago = ultimoPagoResult.rows[0];
+  const estadoReutilizable = ultimoPago && ["PENDING", "IN_PROCESS"].includes(ultimoPago.estado);
+  const pedidoParaCheckout = estadoReutilizable
+    ? { ...pedido, wompi_reference: ultimoPago.referencia }
+    : { ...pedido, wompi_reference: null };
+  const checkout = wompiService.crearCheckout(pedidoParaCheckout);
+
+  if (checkout.reference !== pedido.wompi_reference) {
+    await pedidoRepository.actualizarCampos(id, { wompi_reference: checkout.reference });
+  }
+  await pool.query(
+    "INSERT INTO pagos (pedido_id, proveedor, referencia, estado, monto_cop, comision_estimada_cop) VALUES ($1, 'wompi', $2, 'PENDING', $3, $4) ON CONFLICT (referencia) DO NOTHING",
+    [id, checkout.reference, Number(pedido.total), Number(pedido.total) * (envConfig.payments.estimatedFeePercent / 100)]
+  );
+  return { checkoutUrl: checkout.checkoutUrl, referencia: checkout.reference, proveedor: "wompi" };
 }
 
-async function confirmarPagoDesdeShopify(pedidoId, payloadShopify, client) {
-  const pedido = await pedidoRepository.obtenerPorId(pedidoId, client);
-  if (!pedido) {
-    console.warn(`Webhook de pago de Shopify referencia un pedido inexistente: ${pedidoId}`);
-    return;
-  }
-  if (pedido.payment_status === "pagado") return;
-  if (pedido.estado === "Cancelado") {
-    throw new Error(`Shopify confirmó pago para un pedido cancelado: ${pedidoId}`);
-  }
-
-  await pedidoRepository.confirmarPago(pedidoId, {
-    shopifyOrderId: String(payloadShopify.id || payloadShopify.admin_graphql_api_id || ""),
-    shopifyOrderNumber: String(payloadShopify.order_number || payloadShopify.name || ""),
-  }, client);
-}
-
-async function marcarReembolsoDesdeShopify(pedidoId, client) {
-  const pedido = await pedidoRepository.obtenerPorId(pedidoId, client);
-  if (!pedido) return;
-  if (pedido.payment_status === "reembolsado") return;
-  await pedidoRepository.marcarReembolso(pedidoId, client);
-}
-
-async function procesarWebhookShopify(topic, payloadShopify, client) {
-  const pedidoId = extraerPedidoIdDesdeNotas(payloadShopify);
-  if (!pedidoId) {
-    console.warn(`Webhook de Shopify (${topic}) sin referencia a un pedido de EdwinGraphics; se ignora.`);
-    return { pedidoId: null };
-  }
-
-  if (topic === "orders/paid") {
-    await confirmarPagoDesdeShopify(pedidoId, payloadShopify, client);
-  } else if (topic === "orders/cancelled") {
-    await cancelarEnTransaccion(pedidoId, client);
-  } else if (topic === "refunds/create") {
-    await marcarReembolsoDesdeShopify(pedidoId, client);
-  }
-
-  return { pedidoId };
-}
-
-/**
- * Libera reservas vencidas solo después de poder invalidar el Draft Order
- * correspondiente en Shopify. Esto evita que un enlace antiguo siga siendo
- * válido después de que el stock vuelva al inventario de EdwinGraphics.
- */
 async function liberarReservasExpiradas() {
   let procesadas = 0;
 
@@ -289,12 +275,8 @@ async function liberarReservasExpiradas() {
         huboUna = true;
 
         for (const pedido of reservas) {
-          if (pedido.shopify_checkout_id) {
-            // eslint-disable-next-line no-await-in-loop
-            await shopifyService.eliminarDraftOrder(pedido.shopify_checkout_id);
-          }
-
-          const detalle = await detallePedidoRepository.obtenerPorPedido(pedido.id);
+          const detalle
+ = await detallePedidoRepository.obtenerPorPedido(pedido.id);
           for (const item of detalle) {
             // eslint-disable-next-line no-await-in-loop
             await productoRepository.restaurarStock(item.producto_id, item.cantidad, client);
@@ -323,6 +305,7 @@ module.exports = {
   cambiarEstado,
   cancelar,
   crearCheckout,
-  procesarWebhookShopify,
+  obtenerBalance,
+  procesarWebhookWompi: wompiService.procesarEvento,
   liberarReservasExpiradas,
 };

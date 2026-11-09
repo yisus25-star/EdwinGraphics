@@ -60,6 +60,13 @@ async function cancelar(req, res) {
   }
 }
 
+async function obtenerBalance(req, res) {
+  try {
+    const balance = await pedidoService.obtenerBalance(req.query);
+    return sendSuccess(res, { message: "Balance financiero obtenido correctamente", data: balance });
+  } catch (error) { return handleControllerError(res, error); }
+}
+
 async function crearCheckout(req, res) {
   try {
     const checkout = await pedidoService.crearCheckout(req.params.id);
@@ -81,4 +88,5 @@ module.exports = {
   cambiarEstado,
   cancelar,
   crearCheckout,
+  obtenerBalance,
 };

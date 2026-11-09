@@ -13,12 +13,21 @@ async function obtenerPorProducto(req, res) {
 
 async function subir(req, res) {
   try {
-    const imagenes = await imagenService.subirImagenes(req.params.productoId, req.files);
+    const imagenes = await imagenService.subirImagenes(req.params.productoId, req.files, req.body.nombres_colores);
     return sendSuccess(res, {
       statusCode: 201,
       message: "Imágenes subidas correctamente",
       data: imagenes,
     });
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
+async function actualizarColorNombre(req, res) {
+  try {
+    const imagen = await imagenService.actualizarColorNombre(req.params.id, req.body.color_nombre);
+    return sendSuccess(res, { message: "Nombre de color actualizado correctamente", data: imagen });
   } catch (error) {
     return handleControllerError(res, error);
   }
@@ -57,6 +66,7 @@ async function eliminar(req, res) {
 module.exports = {
   obtenerPorProducto,
   subir,
+  actualizarColorNombre,
   actualizarOrden,
   marcarComoPrincipal,
   eliminar,

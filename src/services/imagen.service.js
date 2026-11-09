@@ -80,7 +80,12 @@ async function optimizarImagen(productoId, archivo) {
   }
 }
 
-async function subirImagenes(productoId, archivos) {
+async function subirImagenes(productoId, archivos, nombresColores = []) {
+  if (typeof nombresColores === "string") {
+    try { nombresColores = JSON.parse(nombresColores); } catch (_) { nombresColores = []; }
+  }
+  if (!Array.isArray(nombresColores)) nombresColores = [];
+  nombresColores = nombresColores.map((nombre) => String(nombre || "").trim().slice(0, 60));
   await asegurarProductoExiste(productoId);
 
   if (!archivos || archivos.length === 0) {
@@ -120,6 +125,7 @@ async function subirImagenes(productoId, archivos) {
         ancho: imagen.ancho,
         alto: imagen.alto,
         tamanoBytes: imagen.tamanoBytes,
+        colorNombre: nombresColores[indice] || `Color / vista ${totalExistente + indice + 1}`,
       });
       imagenesCreadas.push(creada);
     }
@@ -136,6 +142,12 @@ async function subirImagenes(productoId, archivos) {
     );
     throw error;
   }
+}
+
+async function actualizarColorNombre(id, colorNombre) {
+  const imagen = await imagenRepository.obtenerPorId(id);
+  if (!imagen) throw ApiError.notFound("Imagen no encontrada");
+  return imagenRepository.actualizarColorNombre(id, String(colorNombre || "").trim().slice(0, 60) || null);
 }
 
 async function actualizarOrden(id, orden) {
@@ -188,6 +200,7 @@ async function eliminarArchivosImagen(imagen) {
 module.exports = {
   listarPorProducto,
   subirImagenes,
+  actualizarColorNombre,
   actualizarOrden,
   marcarComoPrincipal,
   eliminar,

@@ -1,10 +1,11 @@
 node_modules/
+**/node_modules/
 .env
+.env.*
+!.env.example
 uploads/
+**/uploads/
 *.log
 Nuevo Archivo WinRAR ZIP.zip
-README.md/
-backend/
-database/
-docs/
-frontend/
+.DS_Store
+Thumbs.db

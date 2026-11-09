@@ -34,6 +34,10 @@ const reglasCrearProducto = [
   body("shopify_variant_id")
     .optional({ nullable: true })
     .isString().withMessage("El id de variante de Shopify debe ser un texto"),
+  body("compatibilidad_moto").optional().isArray({ max: 50 }).withMessage("La compatibilidad debe ser una lista de motos"),
+  body("compatibilidad_moto.*").optional().isString().isLength({ min: 1, max: 120 }).withMessage("Cada moto debe tener entre 1 y 120 caracteres"),
+  body("variantes").optional().isArray({ max: 50 }).withMessage("Las variantes deben ser una lista"),
+  body("variantes.*.color").optional().isString().isLength({ max: 80 }).withMessage("El color no puede superar 80 caracteres"),
 ];
 
 const reglasActualizarProducto = [
@@ -72,6 +76,10 @@ const reglasActualizarProducto = [
   body("shopify_variant_id")
     .optional({ nullable: true })
     .isString().withMessage("El id de variante de Shopify debe ser un texto"),
+  body("compatibilidad_moto").optional().isArray({ max: 50 }).withMessage("La compatibilidad debe ser una lista de motos"),
+  body("compatibilidad_moto.*").optional().isString().isLength({ min: 1, max: 120 }).withMessage("Cada moto debe tener entre 1 y 120 caracteres"),
+  body("variantes").optional().isArray({ max: 50 }).withMessage("Las variantes deben ser una lista"),
+  body("variantes.*.color").optional().isString().isLength({ max: 80 }).withMessage("El color no puede superar 80 caracteres"),
 ];
 
 const reglasIdProducto = [

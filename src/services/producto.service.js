@@ -39,7 +39,7 @@ async function listar(query) {
   const filtros = {
     categoriaId: query.categoria_id ? parseInt(query.categoria_id, 10) : undefined,
     estado: query.estado !== undefined ? query.estado === "true" : undefined,
-    q: query.q ? query.q.trim() : undefined,
+    q: query.q ? query.q.trim().slice(0, 120) : undefined,
   };
 
   const [productos, total] = await Promise.all([
@@ -51,6 +51,11 @@ async function listar(query) {
     productos,
     meta: buildPaginationMeta({ page, limit, total }),
   };
+}
+
+async function masVendidos(query = {}) {
+  const limit = Math.min(Math.max(parseInt(query.limit, 10) || 8, 1), 20);
+  return productoRepository.obtenerMasVendidos({ limit });
 }
 
 async function obtenerPorId(id) {
@@ -84,6 +89,8 @@ async function crear(datos) {
     estado: datos.estado !== undefined ? datos.estado : true,
     shopifyProductId: datos.shopify_product_id || null,
     shopifyVariantId: datos.shopify_variant_id || null,
+    compatibilidadMoto: datos.compatibilidad_moto || [],
+    variantes: datos.variantes || [],
   });
 }
 
@@ -108,6 +115,8 @@ async function actualizar(id, datos) {
   if (datos.estado !== undefined) campos.estado = datos.estado;
   if (datos.shopify_product_id !== undefined) campos.shopify_product_id = datos.shopify_product_id;
   if (datos.shopify_variant_id !== undefined) campos.shopify_variant_id = datos.shopify_variant_id;
+  if (datos.compatibilidad_moto !== undefined) campos.compatibilidad_moto = datos.compatibilidad_moto;
+  if (datos.variantes !== undefined) campos.variantes = datos.variantes;
 
   return productoRepository.actualizar(id, campos);
 }
@@ -119,6 +128,7 @@ async function eliminar(id) {
 
 module.exports = {
   listar,
+  masVendidos,
   obtenerPorId,
   obtenerPorSlug,
   crear,

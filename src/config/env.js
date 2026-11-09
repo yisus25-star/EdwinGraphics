@@ -14,14 +14,14 @@ module.exports = {
     baseUrl: process.env.UPLOAD_BASE_URL || "/uploads",
     maxFileSizeMb: parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB, 10) || 5,
   },
-  shopify: {
-    storeDomain: process.env.SHOPIFY_STORE_DOMAIN || "",
-    adminApiToken: process.env.SHOPIFY_ADMIN_API_TOKEN || "",
-    apiVersion: process.env.SHOPIFY_API_VERSION || "2026-07",
-    clientSecret: process.env.SHOPIFY_CLIENT_SECRET || "",
-    currency: process.env.SHOPIFY_CURRENCY || "COP",
-    webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || process.env.SHOPIFY_CLIENT_SECRET || "",
-    reservationMinutes: parseInt(process.env.SHOPIFY_RESERVATION_MINUTES, 10) || 30,
-    mock: process.env.SHOPIFY_MOCK === "true",
+  payments: {
+    provider: (process.env.PAYMENT_PROVIDER || "wompi").toLowerCase(),
+    wompiPublicKey: process.env.WOMPI_PUBLIC_KEY || "",
+    wompiIntegritySecret: process.env.WOMPI_INTEGRITY_SECRET || "",
+    wompiEventsSecret: process.env.WOMPI_EVENTS_SECRET || "",
+    wompiEnvironment: (process.env.WOMPI_ENVIRONMENT || "sandbox").toLowerCase(),
+    baseUrl: process.env.PUBLIC_BASE_URL || "http://localhost:3000",
+    estimatedFeePercent: Number(process.env.PAYMENT_ESTIMATED_FEE_PERCENT || 0),
+    reservationMinutes: parseInt(process.env.PAYMENT_RESERVATION_MINUTES, 10) || 30,
   },
 };

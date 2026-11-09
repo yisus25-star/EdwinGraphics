@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 const pool = require("../src/config/db");
 
-const CARPETA_MIGRACIONES = path.join(__dirname, "..", "..", "database", "migrations");
+const CARPETA_MIGRACIONES = path.join(__dirname, "..", "database", "migrations");
 
 async function asegurarTablaControl(client) {
   await client.query(`

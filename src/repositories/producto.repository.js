@@ -11,6 +11,8 @@ const SELECT_PRODUCTO_CON_IMAGEN = `
     p.id, p.nombre, p.slug, p.descripcion, p.precio, p.stock,
     p.categoria_id, p.estado, p.created_at, p.updated_at,
     p.shopify_product_id, p.shopify_variant_id,
+    COALESCE(p.compatibilidad_moto, ARRAY[]::TEXT[]) AS compatibilidad_moto,
+    COALESCE(p.variantes, '[]'::jsonb) AS variantes,
     COALESCE(imagen.url_medium, imagen.url) AS imagen_principal,
     COALESCE(imagen.url_thumbnail, imagen.url) AS imagen_principal_thumbnail,
     COALESCE(imagen.url_large, imagen.url) AS imagen_principal_large
@@ -45,7 +47,8 @@ function construirFiltros({ categoriaId, estado, q }) {
 
   if (q) {
     valores.push(`%${q}%`);
-    condiciones.push(`(p.nombre ILIKE $${valores.length} OR p.descripcion ILIKE $${valores.length})`);
+    const parametro = "$" + valores.length;
+    condiciones.push(`(p.nombre ILIKE ${parametro} OR p.descripcion ILIKE ${parametro} OR array_to_string(COALESCE(p.compatibilidad_moto, ARRAY[]::TEXT[]), ' ') ILIKE ${parametro} OR EXISTS (SELECT 1 FROM categorias c WHERE c.id = p.categoria_id AND c.nombre ILIKE ${parametro}))`);
   }
 
   const clausula = condiciones.length ? `WHERE ${condiciones.join(" AND ")}` : "";
@@ -110,28 +113,31 @@ async function crear({
   estado,
   shopifyProductId = null,
   shopifyVariantId = null,
+  compatibilidadMoto = [],
+  variantes = [],
 }) {
   const resultado = await pool.query(
-    `INSERT INTO productos (nombre, slug, descripcion, precio, stock, categoria_id, estado, shopify_product_id, shopify_variant_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-     RETURNING id, nombre, slug, descripcion, precio, stock, categoria_id, estado, created_at, updated_at, shopify_product_id, shopify_variant_id`,
-    [nombre, slug, descripcion, precio, stock, categoriaId, estado, shopifyProductId, shopifyVariantId]
+    `INSERT INTO productos (nombre, slug, descripcion, precio, stock, categoria_id, estado, shopify_product_id, shopify_variant_id, compatibilidad_moto, variantes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb)
+     RETURNING id, nombre, slug, descripcion, precio, stock, categoria_id, estado, created_at, updated_at, shopify_product_id, shopify_variant_id, compatibilidad_moto, variantes`,
+    [nombre, slug, descripcion, precio, stock, categoriaId, estado, shopifyProductId, shopifyVariantId, compatibilidadMoto, JSON.stringify(variantes)]
   );
   return resultado.rows[0];
 }
 
 async function actualizar(id, campos) {
-  const claves = Object.keys(campos);
+  const permitidas = new Set(["nombre", "slug", "descripcion", "precio", "stock", "categoria_id", "estado", "shopify_product_id", "shopify_variant_id", "compatibilidad_moto", "variantes"]);
+  const claves = Object.keys(campos).filter((clave) => permitidas.has(clave));
   if (claves.length === 0) return obtenerPorId(id);
 
-  const asignaciones = claves.map((clave, indice) => `${clave} = $${indice + 1}`);
-  const valores = claves.map((clave) => campos[clave]);
+  const asignaciones = claves.map((clave, indice) => clave === "variantes" ? `${clave} = $${indice + 1}::jsonb` : `${clave} = $${indice + 1}`);
+  const valores = claves.map((clave) => clave === "variantes" ? JSON.stringify(campos[clave]) : campos[clave]);
 
   const consulta = `
     UPDATE productos
     SET ${asignaciones.join(", ")}, updated_at = NOW()
     WHERE id = $${claves.length + 1}
-    RETURNING id, nombre, slug, descripcion, precio, stock, categoria_id, estado, created_at, updated_at, shopify_product_id, shopify_variant_id
+    RETURNING id, nombre, slug, descripcion, precio, stock, categoria_id, estado, created_at, updated_at, shopify_product_id, shopify_variant_id, compatibilidad_moto, variantes
   `;
 
   const resultado = await pool.query(consulta, [...valores, id]);
@@ -170,6 +176,32 @@ async function restaurarStock(id, cantidad, clienteDb = pool) {
   return resultado.rows[0] || null;
 }
 
+async function obtenerMasVendidos({ limit = 8 } = {}) {
+  const resultado = await pool.query(
+    `SELECT p.id, p.nombre, p.slug, p.descripcion, p.precio, p.stock, p.categoria_id,
+            p.estado, p.created_at, p.updated_at, p.shopify_product_id, p.shopify_variant_id,
+            p.compatibilidad_moto, p.variantes,
+            COALESCE(imagen.url_medium, imagen.url) AS imagen_principal,
+            COALESCE(imagen.url_thumbnail, imagen.url) AS imagen_principal_thumbnail,
+            COALESCE(imagen.url_large, imagen.url) AS imagen_principal_large,
+            SUM(dp.cantidad)::int AS unidades_vendidas
+     FROM productos p
+     LEFT JOIN LATERAL (
+       SELECT url, url_thumbnail, url_medium, url_large
+       FROM producto_imagenes pi WHERE pi.producto_id = p.id
+       ORDER BY pi.es_principal DESC, pi.orden ASC, pi.id ASC LIMIT 1
+     ) imagen ON TRUE
+     JOIN detalle_pedido dp ON dp.producto_id = p.id
+     JOIN pedidos pe ON pe.id = dp.pedido_id
+     WHERE p.estado = TRUE AND pe.payment_status = 'pagado'
+     GROUP BY p.id, imagen.url, imagen.url_thumbnail, imagen.url_medium, imagen.url_large
+     ORDER BY unidades_vendidas DESC, p.nombre ASC
+     LIMIT $1`,
+    [Math.min(Math.max(Number(limit) || 8, 1), 20)]
+  );
+  return resultado.rows;
+}
+
 async function obtenerPorIdParaActualizar(id, clienteDb = pool) {
   const resultado = await clienteDb.query(
     "SELECT id, nombre, precio, stock FROM productos WHERE id = $1 FOR UPDATE",
@@ -190,4 +222,5 @@ module.exports = {
   descontarStock,
   restaurarStock,
   obtenerPorIdParaActualizar,
+  obtenerMasVendidos,
 };
