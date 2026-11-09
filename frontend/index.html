@@ -260,12 +260,7 @@
         <textarea id="cObservations" rows="3" maxlength="2000" placeholder="¿Qué color prefieres? ¿Para qué moto y modelo es? Cuéntanos cualquier detalle importante."></textarea>
 
         <span class="field-label">Método de Pago</span>
-        <select id="cPayment">
-          <option value="Nequi">Nequi</option>
-          <option value="PSE">PSE</option>
-          <option value="Tarjeta">Tarjeta Débito/Crédito</option>
-          <option value="Shopify / Online">Pagar Online (Shopify)</option>
-        </select>
+        <input type="hidden" id="cPayment" value="Wompi" />
 
         <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
           <button type="submit" class="btn-add-cart" style="width:100%; padding:12px;"><i class="fa-solid fa-lock"></i> &nbsp;Crear pedido y pagar</button>
@@ -302,7 +297,7 @@
         
         <div class="admin-form-box" style="border-color:var(--red);">
           <h4 style="font-size:14px;margin-bottom:8px;color:var(--red);">Conexión de pagos</h4>
-          <p style="font-size:13px;color:#ccc;line-height:1.6;">El checkout se genera desde el backend. Configura las credenciales y el modo de Shopify en las variables de entorno del servidor. No guardes tokens ni claves en este panel.</p>
+          <p style="font-size:13px;color:#ccc;line-height:1.6;">El pago se procesa mediante Wompi. Configura las credenciales exclusivamente en el archivo .env del backend. No guardes llaves privadas en el frontend ni en este panel.</p>
         </div>
 
         <!-- SECCIÓN: AÑADIR PRODUCTO -->
