@@ -24,14 +24,4 @@ module.exports = {
     estimatedFeePercent: Number(process.env.PAYMENT_ESTIMATED_FEE_PERCENT || 0),
     reservationMinutes: parseInt(process.env.PAYMENT_RESERVATION_MINUTES, 10) || 30,
   },
-  shopify: {
-    storeDomain: process.env.SHOPIFY_STORE_DOMAIN || "",
-    adminApiToken: process.env.SHOPIFY_ADMIN_API_TOKEN || "",
-    apiVersion: process.env.SHOPIFY_API_VERSION || "2026-07",
-    clientSecret: process.env.SHOPIFY_CLIENT_SECRET || "",
-    currency: process.env.SHOPIFY_CURRENCY || "COP",
-    webhookSecret: process.env.SHOPIFY_WEBHOOK_SECRET || process.env.SHOPIFY_CLIENT_SECRET || "",
-    reservationMinutes: parseInt(process.env.PAYMENT_RESERVATION_MINUTES, 10) || 30,
-    mock: process.env.SHOPIFY_MOCK === "true",
-  },
 };
