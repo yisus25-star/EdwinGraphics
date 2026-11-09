@@ -605,3 +605,5 @@ body.page-catalog .catalog-footer { margin-top:30px; }
   #cartModal #checkoutForm { grid-template-columns:1fr; padding:12px; }
   #cartModal #checkoutForm > * { grid-column:1/-1; }
 }
+
+#detailsModal .modal-card > div:last-child { grid-area:actions; align-self:start; }
