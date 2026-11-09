@@ -4,8 +4,8 @@ const env = require("../config/env");
 const ApiError = require("../utils/ApiError");
 
 function validarConfiguracionCheckout(cfg) {
-  if (!cfg.wompiPublicKey || !cfg.wompiIntegritySecret) {
-    throw ApiError.badRequest("Faltan WOMPI_PUBLIC_KEY y WOMPI_INTEGRITY_SECRET en el backend.");
+  if (!cfg.wompiPublicKey || !cfg.wompiIntegritySecret || !cfg.wompiEventsSecret) {
+    throw ApiError.badRequest("Configura WOMPI_PUBLIC_KEY, WOMPI_INTEGRITY_SECRET y WOMPI_EVENTS_SECRET en el backend antes de aceptar pedidos.");
   }
 
   const prefijoEsperado = cfg.wompiEnvironment === "production" ? "pub_prod_" : "pub_test_";
@@ -148,4 +148,4 @@ async function procesarEvento(evento) {
   }
 }
 
-module.exports = { crearCheckout, procesarEvento };
+module.exports = { crearCheckout, procesarEvento, validarConfiguracionCheckout };
