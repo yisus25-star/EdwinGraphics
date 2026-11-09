@@ -273,7 +273,6 @@
     let categories = [];
     let orders = [];
     let cart = [];
-    let globalShopify = '';
     let activeEditingId = null;
     let apiReady = false;
     let detailQuantity = 1;
@@ -845,7 +844,7 @@
           ciudad: document.getElementById('cCity').value.trim(),
           direccion: document.getElementById('cAddress').value.trim()
         },
-        metodo_pago: document.getElementById('cPayment').value,
+        metodo_pago: 'Wompi',
         observaciones: document.getElementById('cObservations')?.value.trim() || '',
         envio: 0,
         items: cart.map(item => ({ producto_id: item.producto_id, cantidad: item.cantidad }))
@@ -870,13 +869,8 @@
         cart = [];
         updateCart();
         closeSysModals();
-        if (String(checkout.checkoutUrl).includes('checkout.simulado.local')) {
-          showToast('Pedido #' + order.id + ' creado en modo de prueba. No se realizó ningún cobro.');
-          alert('Modo de prueba\n\nPedido #' + order.id + ' creado correctamente.\nNo se realizó ningún cobro.\n\nPara recibir pagos reales, configura la pasarela elegida en el backend.');
-        } else {
-          showToast('Pedido #' + order.id + ' creado. Abriendo el pago seguro…');
-          window.location.href = checkout.checkoutUrl;
-        }
+        showToast('Pedido #' + order.id + ' creado. Abriendo el pago seguro de Wompi…');
+        window.location.href = checkout.checkoutUrl;
       } catch (error) {
         if (createdOrderId && /reserva.*expir|reserva de stock.*expir/i.test(error.message)) {
           sessionStorage.removeItem('edwingraphics_pending_order');
@@ -933,10 +927,6 @@
       } catch (error) {
         note.textContent = 'No se pudo cargar el balance: ' + error.message;
       }
-    }
-
-    async function saveGlobalShopify() {
-      showToast('El pago Shopify se configura en el backend mediante variables de entorno.', 'fa-triangle-exclamation');
     }
 
     async function renderAdminList() {
