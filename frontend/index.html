@@ -1,172 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EdwinGraphics | Personalización Premium de Motos</title>
-    <link rel="icon" type="image/png" href="logo-edwin.png" />
-    <link rel="apple-touch-icon" href="logo-edwin.png" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EdwinGraphics | Personalización Premium de Motos</title>
-    <link rel="icon" type="image/png" href="cabeza-edwin.png" />
-    <link rel="apple-touch-icon" href="cabeza-edwin.png" />
-
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090a0d" />
+  <meta name="description" content="Personaliza tu motocicleta con calcomanías, kits gráficos y diseños exclusivos EdwinGraphics. Explora nuestro catálogo y encuentra tu estilo." />
+  <title>EdwinGraphics | Calcomanías y personalización para motos</title>
+  <link rel="icon" type="image/png" href="cabeza-edwin.png" />
+  <link rel="apple-touch-icon" href="cabeza-edwin.png" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" />
-
   <link rel="stylesheet" href="assets/css/store.css" />
   <link rel="stylesheet" href="assets/css/visual-refresh.css" />
+  <link rel="stylesheet" href="assets/css/home-page.css" />
 </head>
-<body>
-
- conserva la animación de introducción sin reproducir video. -->
-  <!-- FIXED NAV HEADER -->
+<body class="page-home">
   <div class="header-wrapper">
-    <header class="header">
-      <button class="promo-circle-btn" onclick="openSysModal('promoModal')" title="Promoción Especial">
-        <i class="fa-solid fa-bolt"></i>
-      </button>
-
-      <div class="header-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">
-        <div class="brand-pixel-text">Edwin<span>Graphics</span></div>
-        <div class="header-logo-space">
-          <img src="logo-edwin.png" alt="Logo" class="header-logo-img" onerror="this.style.display='none'" />
-        </div>
-      </div>
-
-      <nav class="nav-pill">
+    <header class="header home-header">
+      <a class="header-brand" href="#inicio" aria-label="EdwinGraphics, inicio">
+        <span class="brand-pixel-text">EDWIN<span>GRAPHICS</span></span>
+        <span class="header-logo-space"><img src="cabeza-edwin.png" alt="" class="header-logo-img" onerror="this.style.display='none'" /></span>
+      </a>
+      <nav class="nav-pill" aria-label="Navegación principal">
         <a href="#inicio" class="nav-link active">Inicio</a>
         <a href="catalogo.html" class="nav-link">Catálogo</a>
-        <a href="#nosotros" class="nav-link">Quiénes somos</a>
+        <a href="#nosotros" class="nav-link">Nosotros</a>
         <a href="#ubicacion" class="nav-link">Ubicación</a>
-        <a href="#redes" class="nav-link">Redes</a>
+        <a href="#redes" class="nav-link">Contacto</a>
       </nav>
-
-      <div class="header-actions">
-        <button class="sign-in-btn" onclick="openSysModal('cartModal')">
-          <i class="fa-solid fa-cart-shopping"></i> &nbsp;<span id="cartCount">0</span>
+      <div class="header-actions home-header-actions">
+        <form class="home-header-search" id="homeHeaderSearch" role="search">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input id="homeHeaderSearchInput" type="search" placeholder="Buscar productos..." aria-label="Buscar productos" />
+        </form>
+        <button class="sign-in-btn home-cart-button" type="button" onclick="openSysModal('cartModal')" aria-label="Abrir carrito">
+          <i class="fa-solid fa-cart-shopping"></i><span id="cartCount">0</span>
         </button>
-        <button class="sign-in-btn" onclick="window.location.href='admin.html'">Admin</button>
+        <a class="sign-in-btn home-admin-link" href="admin.html">Admin</a>
       </div>
     </header>
   </div>
 
-  <!-- MAIN CONTENT CONTAINER -->
-  <div class="content-container">
-
-    <!-- HERO SECTION -->
-    <section class="hero-section" id="inicio">
-      <h1 class="headline">
-        Tu estilo no se copia,<br />se diseña.
-      </h1>
-
-      <p class="subhead">
-        Personalización premium para tu moto. Vinilos de gran formato, diseños exclusivos y acabados profesionales que llevan tu moto a otro nivel.
-      </p>
-
-      <div class="hero-visual">
-        <img src="assets/images/hero-moto.jpg" alt="Personalización gráfica de motocicleta" onerror="this.remove();this.parentElement.classList.add('image-placeholder');" />
-        <span class="hero-image-hint">Personalización que se nota</span>
-      </div>
-      <a href="catalogo.html" class="cta-btn-main">Explorar catálogo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-
-      <div class="stats-footer">
-        <div class="stat-item">
-          <span class="stat-icon"><i class="fa-solid fa-motorcycle"></i></span>
-          <div class="stat-data">
-            <span class="stat-value">+2500</span>
-            <span class="stat-label">Motos Personalizadas</span>
-          </div>
+  <main class="home-main" id="inicio">
+    <section class="home-hero" aria-label="Diseños destacados de EdwinGraphics">
+      <div class="home-hero-backdrop"></div>
+      <div class="home-hero-copy">
+        <span class="home-eyebrow"><i class="fa-solid fa-bolt"></i> DISEÑO Y PERSONALIZACIÓN PARA MOTOS</span>
+        <p class="home-hero-kicker">CALCOMANÍAS <b>/</b> KITS GRÁFICOS <b>/</b> ACCESORIOS</p>
+        <h1>Tu moto.<br /><span>Tu estilo.</span><br />Que se note.</h1>
+        <p class="home-hero-description">Dale una nueva identidad a tu motocicleta con diseños gráficos que destacan. Encuentra el estilo que buscas y transforma cada detalle.</p>
+        <div class="home-hero-actions">
+          <a class="home-button home-button-primary" href="catalogo.html"><i class="fa-solid fa-cart-shopping"></i> Explorar catálogo</a>
+          <a class="home-button home-button-outline" href="#nosotros"><i class="fa-solid fa-wand-magic-sparkles"></i> Conoce EdwinGraphics</a>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon"><i class="fa-solid fa-award"></i></span>
-          <div class="stat-data">
-            <span class="stat-value">1 Año</span>
-            <span class="stat-label">De Experiencia</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon"><i class="fa-solid fa-shield-halved"></i></span>
-          <div class="stat-data">
-            <span class="stat-value">100%</span>
-            <span class="stat-label">Garantía de Calidad</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon"><i class="fa-solid fa-location-dot"></i></span>
-          <div class="stat-data">
-            <span class="stat-value">2 Locales</span>
-            <span class="stat-label">Puntos Físicos</span>
-          </div>
+        <div class="home-hero-proof">
+          <span><i class="fa-solid fa-shield-halved"></i> Diseños para destacar</span>
+          <span><i class="fa-solid fa-palette"></i> Personalización gráfica</span>
         </div>
       </div>
-    </section> 
-    <section class="section-block" id="nosotros">
-      <div class="section-header-tag">EDWINGRAPHICS</div>
-      <h2 class="section-title">Diseñamos tu estilo</h2>
-      <div class="about-grid">
-        <div>
-          <p class="section-subtitle">Más que calcomanías: una forma de hacer que tu moto hable por ti.</p>
-          <p style="color:#d4d4d8;line-height:1.8;margin-bottom:18px;">Creamos soluciones de personalización para motocicletas, con diseños pensados para destacar y acabados que acompañan tu estilo. Explora el catálogo y cuéntanos qué color o combinación tienes en mente.</p>
-          <a href="#catalogo" class="btn-route-normal">Explorar diseños</a>
+      <div class="home-hero-visual">
+        <div class="home-hero-slides" id="homeHeroSlides">
+          <div class="home-hero-slide is-active home-hero-fallback">
+            <img src="assets/images/hero-moto.jpg" alt="Motocicleta con diseño gráfico personalizado" />
+          </div>
         </div>
-        <div class="about-panel"><strong style="color:#fff;">Personalización a tu medida</strong><br />Busca por nombre, categoría o moto compatible. Si necesitas una combinación especial, déjanos las observaciones al realizar tu pedido.</div>
+        <div class="home-hero-image-shade"></div>
+        <div class="home-hero-caption"><span class="home-live-dot"></span><span id="homeHeroCaption">Encuentra los gráficos para tu moto</span></div>
+        <div class="home-hero-controls">
+          <button type="button" id="homeHeroPrev" aria-label="Imagen anterior"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="home-hero-dots" id="homeHeroDots" aria-label="Seleccionar imagen"></div>
+          <button type="button" id="homeHeroNext" aria-label="Imagen siguiente"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+      <div class="home-hero-bottomline"><span>EDWINGRAPHICS</span><span>PERSONALIZA · DESTACA · RUEDA</span></div>
+    </section>
+
+    <section class="home-benefits" aria-label="Beneficios de comprar en EdwinGraphics">
+      <article class="home-benefit"><span class="home-benefit-icon"><i class="fa-solid fa-medal"></i></span><div><strong>Diseños que destacan</strong><small>Personalidad para tu motocicleta</small></div></article>
+      <article class="home-benefit"><span class="home-benefit-icon"><i class="fa-solid fa-box"></i></span><div><strong>Opciones de envío</strong><small>Consulta la entrega para tu ciudad</small></div></article>
+      <article class="home-benefit"><span class="home-benefit-icon"><i class="fa-solid fa-lock"></i></span><div><strong>Pago seguro con Wompi</strong><small>Compra online cuando esté habilitado</small></div></article>
+      <article class="home-benefit"><span class="home-benefit-icon"><i class="fa-brands fa-whatsapp"></i></span><div><strong>Atención directa</strong><small>Resolvemos tus dudas por WhatsApp</small></div></article>
+    </section>
+
+    <section class="home-section home-categories" id="categorias">
+      <div class="home-section-heading">
+        <div><span class="home-section-kicker">ENCUENTRA TU ESTILO</span><h2>Explora por <em>categorías</em></h2><p>Elige el tipo de gráfico que quieres para tu moto.</p></div>
+        <a class="home-text-link" href="catalogo.html">Ver todo el catálogo <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="home-category-grid" id="homeCategoryGrid">
+        <div class="home-loading-card">Cargando categorías...</div>
       </div>
     </section>
-    <!-- El catálogo de productos vive en catalogo.html -->
 
-    <!-- UBICACIÓN SECTION -->
-    <section class="section-block" id="ubicacion">
-      <div class="section-header-tag">VISÍTANOS</div>
-      <h2 class="section-title">Ubicación</h2>
-      <p class="section-subtitle">Encuéntranos en nuestros locales físicos.</p>
+    <section class="home-featured" id="mas-vendidos">
+      <div class="home-section-heading">
+        <div><span class="home-section-kicker">LOS FAVORITOS</span><h2>Los más <em>buscados</em></h2><p>Descubre algunos de los diseños que están llamando la atención.</p></div>
+        <a class="home-text-link" href="catalogo.html">Descubrir todos los productos <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="home-featured-grid" id="homeFeaturedGrid">
+        <div class="home-loading-card">Preparando productos destacados...</div>
+      </div>
+    </section>
 
-      <div class="location-wrapper">
-        <div class="location-info">
-          <h3>Palos Verde</h3>
+    <section class="home-about" id="nosotros">
+      <div class="home-about-art">
+        <div class="home-about-mark">EG<span>///</span></div>
+        <div class="home-about-image-label">TU MOTO HABLA POR TI</div>
+      </div>
+      <div class="home-about-copy">
+        <span class="home-section-kicker">SOMOS EDWINGRAPHICS</span>
+        <h2>Más que calcomanías.<br /><em>Una identidad.</em></h2>
+        <p>Somos un espacio dedicado a la personalización gráfica de motocicletas. Creamos soluciones para quienes quieren que su moto refleje su personalidad, con diseños que destacan y combinaciones que hacen la diferencia.</p>
+        <p>Explora nuestros kits, encuentra gráficos para diferentes partes de tu moto y, si tienes una idea especial, cuéntanos cómo quieres verla.</p>
+        <a class="home-button home-button-primary" href="https://wa.me/573116945695?text=Hola%20EdwinGraphics%2C%20quiero%20informaci%C3%B3n%20sobre%20personalizaci%C3%B3n%20para%20mi%20moto." target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Hablemos de tu diseño</a>
+      </div>
+    </section>
+
+    <section class="home-location home-section" id="ubicacion">
+      <div class="home-section-heading">
+        <div><span class="home-section-kicker">VEN A CONOCERNOS</span><h2>Estamos cerca de <em>ti</em></h2><p>Visítanos y conoce nuestros trabajos de personalización.</p></div>
+      </div>
+      <div class="home-location-grid">
+        <div class="home-location-card">
+          <span class="home-location-icon"><i class="fa-solid fa-location-dot"></i></span>
+          <span class="home-section-kicker">PUNTO FÍSICO</span>
+          <h3>Palos Verdes</h3>
           <p>Contamos con dos locales dentro del mismo punto para atenderte mejor y mostrarte nuestros trabajos en vivo.</p>
-          <a href="https://maps.app.goo.gl/6gZzkRh1tiLtpwGb9" target="_blank" class="btn-route-normal">Ver ruta</a>
+          <a class="home-button home-button-primary" href="https://maps.app.goo.gl/6gZzkRh1tiLtpwGb9" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> Cómo llegar</a>
         </div>
-        <div class="map-container">
-          <iframe src="https://www.google.com/maps?q=4.2630666,-73.5584399+(Palos+Verdes)&z=17&output=embed" loading="lazy"></iframe>
+        <div class="home-map-frame">
+          <iframe title="Ubicación de EdwinGraphics en Palos Verdes" src="https://www.google.com/maps?q=4.2630666,-73.5584399+(Palos+Verdes)&z=17&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       </div>
     </section>
 
-    <!-- REDES SOCIALES SECTION -->
-    <section class="section-block" id="redes">
-      <div class="section-header-tag">SÍGUENOS</div>
-      <h2 class="section-title">Redes sociales</h2>
-      <p class="section-subtitle">Mira nuestros trabajos y escríbenos directamente.</p>
-
-      <div class="social-grid">
-        <a href="https://www.tiktok.com/@edwincalcomanias" target="_blank" class="social-card">
-          <i class="fa-brands fa-tiktok"></i>
-          <span>TikTok</span>
-        </a>
-        <a href="https://www.instagram.com/ediwngrapichs" target="_blank" class="social-card">
-          <i class="fa-brands fa-instagram"></i>
-          <span>Instagram</span>
-        </a>
-        <a href="https://www.facebook.com/share/1Jp7fpSR3B/" target="_blank" class="social-card">
-          <i class="fa-brands fa-facebook"></i>
-          <span>Facebook</span>
-        </a>
-        <a href="https://wa.me/573116945695" target="_blank" class="social-card">
-          <i class="fa-brands fa-whatsapp"></i>
-          <span>WhatsApp</span>
-        </a>
+    <section class="home-social" id="redes">
+      <div class="home-social-copy"><span class="home-section-kicker">SIGUE NUESTRO TRABAJO</span><h2>La inspiración también <em>rueda.</em></h2><p>Conoce nuestros diseños, mira trabajos y escríbenos para encontrar el estilo de tu moto.</p></div>
+      <div class="home-social-links">
+        <a href="https://www.tiktok.com/@edwincalcomanias" target="_blank" rel="noopener"><i class="fa-brands fa-tiktok"></i><span>TikTok</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="https://www.instagram.com/ediwngrapichs" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i><span>Instagram</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="https://www.facebook.com/share/1Jp7fpSR3B/" target="_blank" rel="noopener"><i class="fa-brands fa-facebook"></i><span>Facebook</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="https://wa.me/573116945695" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
       </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="site-footer">
-      <div>© 2026 EdwinGraphics. Todos los derechos reservados.</div>
-      <div>Si quieres personalizar tu moto, no te detengas con nosotros.</div>
-    </footer>
+    <section class="home-final-cta">
+      <div><span class="home-section-kicker">EL SIGUIENTE PASO ES TUYO</span><h2>Tu moto merece <em>destacar.</em></h2><p>Encuentra los gráficos que van con tu estilo.</p></div>
+      <a class="home-button home-button-primary" href="catalogo.html">Entrar al catálogo <i class="fa-solid fa-arrow-right"></i></a>
+    </section>
+  </main>
 
-  </div>
+  <footer class="home-footer">
+    <a class="home-footer-brand" href="#inicio">EDWIN<span>GRAPHICS</span></a>
+    <p>Calcomanías, kits gráficos y personalización para motocicletas.</p>
+    <div class="home-footer-links"><a href="catalogo.html">Catálogo</a><a href="#nosotros">Nosotros</a><a href="#ubicacion">Ubicación</a><a href="#redes">Redes sociales</a></div>
+    <small>© 2026 EdwinGraphics. Todos los derechos reservados.</small>
+  </footer>
 
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
@@ -363,5 +352,6 @@
   </div>
 
   <script src="assets/js/store.js" defer></script>
+  <script src="assets/js/home-page.js" defer></script>
 </body>
 </html>
