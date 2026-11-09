@@ -388,6 +388,18 @@
         ).join('');
         filter.value = categories.some(category => String(category.id) === selected) ? selected : '';
       }
+      const categoryChecks = document.getElementById('catalogCategoryChecks');
+      if (categoryChecks) {
+        const selectedIds = new Set(Array.from(categoryChecks.querySelectorAll('input:checked')).map(input => input.value));
+        categoryChecks.innerHTML = categories.map(category =>
+          '<label class="catalog-check"><input type="checkbox" class="catalog-category-check" value="' + Number(category.id) + '"' + (selectedIds.has(String(category.id)) ? ' checked' : '') + '><span>' + escapeHtml(category.nombre) + '</span></label>'
+        ).join('');
+        categoryChecks.querySelectorAll('input').forEach(input => input.addEventListener('change', () => {
+          const all = document.getElementById('catalogAllCategories');
+          if (all) all.checked = categoryChecks.querySelectorAll('input:checked').length === 0;
+          renderProducts();
+        }));
+      }
       if (adminSelect) {
         adminSelect.innerHTML = '<option value="">Selecciona una categoría</option>' + categories.map(category =>
           '<option value="' + Number(category.id) + '">' + escapeHtml(category.nombre) + '</option>'
@@ -464,7 +476,11 @@
       document.getElementById('catalogCategory')?.addEventListener('change', renderProducts);
       document.getElementById('catalogMoto')?.addEventListener('change', renderProducts);
       document.getElementById('catalogSort')?.addEventListener('change', renderProducts);
-      document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; renderProducts(); });
+      document.getElementById('catalogMoto')?.addEventListener('change', renderProducts);
+      document.getElementById('catalogPriceMax')?.addEventListener('input', () => { updateCatalogPriceLabel(); renderProducts(); });
+      document.getElementById('catalogAllCategories')?.addEventListener('change', event => { if (event.target.checked) { document.querySelectorAll('.catalog-category-check').forEach(input => input.checked = false); renderProducts(); } });
+      document.getElementById('applyCatalogFilters')?.addEventListener('click', renderProducts);
+      document.getElementById('clearCatalogFilters')?.addEventListener('click', () => { const search = document.getElementById('catalogSearch'); const category = document.getElementById('catalogCategory'); const moto = document.getElementById('catalogMoto'); const sort = document.getElementById('catalogSort'); const price = document.getElementById('catalogPriceMax'); if (search) search.value = ''; if (category) category.value = ''; if (moto) moto.value = ''; if (sort) sort.value = 'featured'; if (price) price.value = price.max; document.querySelectorAll('.catalog-category-check').forEach(input => input.checked = false); const all = document.getElementById('catalogAllCategories'); if (all) all.checked = true; updateCatalogPriceLabel(); renderProducts(); });
       document.getElementById('checkoutForm')?.addEventListener('submit', submitOrder);
       document.getElementById('newProdImages')?.addEventListener('change', renderNewProductImagePreview);
       document.getElementById('cpNewImages')?.addEventListener('change', renderEditedNewImagePreview);
@@ -540,19 +556,33 @@
       }
     }
 
+    function updateCatalogPriceLabel() {
+      const slider = document.getElementById('catalogPriceMax');
+      const label = document.getElementById('catalogPriceMaxLabel');
+      const rangeLabel = document.getElementById('catalogPriceRangeLabel');
+      if (!slider) return;
+      const formatted = '$' + Number(slider.value).toLocaleString('es-CO');
+      if (label) label.textContent = Number(slider.value) >= Number(slider.max) ? 'Sin límite' : formatted;
+      if (rangeLabel) rangeLabel.textContent = 'Hasta ' + formatted;
+    }
+
     function renderProducts() {
       const grid = document.getElementById('productsGrid');
       if (!grid) return;
       const query = (document.getElementById('catalogSearch')?.value || '').trim().toLocaleLowerCase('es');
       const categoryId = document.getElementById('catalogCategory')?.value || '';
+      const checkedCategoryIds = Array.from(document.querySelectorAll('.catalog-category-check:checked')).map(input => input.value);
       const moto = document.getElementById('catalogMoto')?.value || '';
+      const maxPrice = Number(document.getElementById('catalogPriceMax')?.value || 1000000);
       const sort = document.getElementById('catalogSort')?.value || 'featured';
       const filtered = products.filter(product => {
         const compatibility = product.compatibilidadMoto || [];
         const text = [product.name, product.tag, product.descripcion, ...compatibility].join(' ').toLocaleLowerCase('es');
-        return (!query || text.includes(query)) &&
-          (!categoryId || String(product.categoria_id) === categoryId) &&
-          (!moto || compatibility.some(value => String(value).toLocaleLowerCase('es') === moto.toLocaleLowerCase('es')));
+        const matchesCategory = checkedCategoryIds.length ? checkedCategoryIds.includes(String(product.categoria_id)) : (!categoryId || String(product.categoria_id) === categoryId);
+        const numericPrice = Number(product.price);
+        return (!query || text.includes(query)) && matchesCategory &&
+          (!moto || compatibility.some(value => String(value).toLocaleLowerCase('es') === moto.toLocaleLowerCase('es'))) &&
+          (!Number.isFinite(numericPrice) || numericPrice <= maxPrice);
       });
       if (sort === 'name-asc') filtered.sort((a,b) => a.name.localeCompare(b.name, 'es'));
       if (sort === 'price-asc') filtered.sort((a,b) => Number(a.price) - Number(b.price));
