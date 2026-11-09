@@ -30,6 +30,10 @@ class ApiError extends Error {
   static conflict(message) {
     return new ApiError(409, message);
   }
+
+  static serviceUnavailable(message) {
+    return new ApiError(503, message);
+  }
 }
 
 module.exports = ApiError;
